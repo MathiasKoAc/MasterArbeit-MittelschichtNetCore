@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using TopicTrennerAPI.Interfaces;
 
 namespace TopicTrennerAPI.Controllers
 {
@@ -10,11 +11,18 @@ namespace TopicTrennerAPI.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
+        private IMqttConnector _mqttConnector;
+
+        public ValuesController(IMqttConnector mqttConnector)
+        {
+            _mqttConnector = mqttConnector;
+        }
+
         // GET api/values
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
-            return new string[] { "value1", "value2" };
+            return new string[] { "value1", "value2", _mqttConnector.Hello() };
         }
 
         // GET api/values/5

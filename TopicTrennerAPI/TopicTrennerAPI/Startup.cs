@@ -5,6 +5,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using TopicTrennerAPI.Models;
+using TopicTrennerAPI.Interfaces;
+using TopicTrennerAPI.Service;
 
 namespace TopicTrennerAPI
 {
@@ -23,6 +25,7 @@ namespace TopicTrennerAPI
             services.AddDbContext<TodoContext>(opt =>
                 opt.UseInMemoryDatabase("TodoList"));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddScoped<IMqttConnector, MqttConnectorService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
