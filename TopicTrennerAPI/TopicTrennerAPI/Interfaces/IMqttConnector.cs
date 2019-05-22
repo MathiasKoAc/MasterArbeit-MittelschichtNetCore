@@ -1,4 +1,6 @@
-﻿namespace TopicTrennerAPI.Interfaces
+﻿using TopicTrennerAPI.Models;
+
+namespace TopicTrennerAPI.Interfaces
 {
     public interface IMqttConnector
     {

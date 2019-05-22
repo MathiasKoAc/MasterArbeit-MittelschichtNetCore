@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TopicTrennerAPI.Interfaces;
@@ -11,6 +10,8 @@ namespace TopicTrennerAPI.Service
 {
     public class MqttConnectorService : IMqttConnector
     {
+        private volatile bool isActive = true;
+
         private IServerConfig _serverConfig;
         private MqttClient client;
         private Dictionary<string, List<IMqttTopicReceiver>> DictTopicReceiver;
@@ -18,7 +19,23 @@ namespace TopicTrennerAPI.Service
         private Queue<MqttMsgPublishEventArgs> receiverQueue;
         private Queue<MqttMsgPublishEventArgs> senderQueue;
 
-        void Start()
+        public MqttConnectorService()
+        {
+            Start();
+        }
+
+        public MqttConnectorService(IServerConfig serverConfig)
+        {
+            Start(serverConfig);
+        }
+
+        public void Start(IServerConfig serverConfig)
+        {
+            _serverConfig = serverConfig;
+            this.Start();
+        }
+
+        public void Start()
         {
             DictTopicReceiver = new Dictionary<string, List<IMqttTopicReceiver>>();
 
@@ -26,12 +43,12 @@ namespace TopicTrennerAPI.Service
 
             try
             {
+                isActive = true;
                 // create client instance 
-                //client = new MqttClient(IPAddress.Parse("143.185.118.233"),8080 , false , null ); 
                 client = new MqttClient(_serverConfig.GetServerIp());
 
                 // register to message received 
-                client.MqttMsgPublishReceived += client_MqttMsgPublishReceived;
+                client.MqttMsgPublishReceived += Client_MqttMsgPublishReceived;
 
                 string clientId = Guid.NewGuid().ToString();
                 byte conacct = client.Connect(clientId, _serverConfig.GetUsername(), _serverConfig.GetPassword());
@@ -42,7 +59,7 @@ namespace TopicTrennerAPI.Service
                     Console.WriteLine("ERROR: MqttConnector can't Connect to the Broker. Check _serverConfig IP, Username, Password.");
                 }
             }
-            catch (Exception se)
+            catch (Exception)
             {
                 this.StopInnerCoroutines();
                 Console.WriteLine(new StringBuilder("ERROR: MqttConnector can't Connect to the Broker on IP: ").Append(_serverConfig.GetServerIp()));
@@ -54,7 +71,7 @@ namespace TopicTrennerAPI.Service
          * The Methode client_MqttMsgPublishReceived is called, if a MqttMessage arrieved and put it into the receiverQueue
          * client_MqttMsgPublishReceived seperats the thread which puts the message in the queue from working the message
          */
-        void client_MqttMsgPublishReceived(object sender, MqttMsgPublishEventArgs e)
+        void Client_MqttMsgPublishReceived(object sender, MqttMsgPublishEventArgs e)
         {
             Console.WriteLine(new StringBuilder("Received: ").Append(System.Text.Encoding.UTF8.GetString(e.Message)).Append(" Topic: ").Append(e.Topic));
             receiverQueue.Enqueue(e);
@@ -78,9 +95,10 @@ namespace TopicTrennerAPI.Service
         private void StartInnerCoroutines()
         {
             //start of the concurrency (Nebenläufig) for receiving Messages
-            StartCoroutine("workReceiverQueueAndCall");
+            Task.Run(WorkReceiverQueueAndCall);
+
             //start of the concurrency (Nebenläufig) for sending Messages
-            StartCoroutine("workSenderQueueAndSend");
+            Task.Run(WorkSenderQueueAndSend);
         }
 
         /**
@@ -88,24 +106,22 @@ namespace TopicTrennerAPI.Service
          */
         private void StopInnerCoroutines()
         {
-            StopCoroutine("workReceiverQueueAndCall");
-            StopCoroutine("workSenderQueueAndSend");
+            isActive = false;
         }
 
         /**
          * workReveiverQueueAndCall is a Inner Coroutine, which loops over the ReceivingQueue to call the Subscriper in this App
-         * workSenderQueueAndSend seperats the thread which puts the message in the queue from working the message
+         * WorkSenderQueueAndSend seperats the thread which puts the message in the queue from working the message
          */
-        private IEnumerator workReceiverQueueAndCall()
+        private void WorkReceiverQueueAndCall()
         {
-            while (true)
+            while (isActive)
             {
                 if (receiverQueue.Count > 0)
                 {
                     MqttMsgPublishEventArgs e = receiverQueue.Dequeue();
 
-                    List<IMqttTopicReceiver> listReceiver = new List<IMqttTopicReceiver>();
-                    if (DictTopicReceiver.TryGetValue(e.Topic.ToLower(), out listReceiver))
+                    if (DictTopicReceiver.TryGetValue(e.Topic.ToLower(), out List<IMqttTopicReceiver> listReceiver))
                     {
                         if (listReceiver != null)
                         {
@@ -116,17 +132,16 @@ namespace TopicTrennerAPI.Service
                         }
                     }
                 }
-                yield return null;
             }
         }
 
         /**
-         * workSenderQueueAndSend is a Inner Coroutine, which loops over the senderQueue to send a Message if there is one
-         * workSenderQueueAndSend seperats the call to send from the sending its self
+         * WorkSenderQueueAndSend is a Inner Coroutine, which loops over the senderQueue to send a Message if there is one
+         * WorkSenderQueueAndSend seperats the call to send from the sending its self
          */
-        private IEnumerator workSenderQueueAndSend()
+        private void WorkSenderQueueAndSend()
         {
-            while (true)
+            while (isActive)
             {
                 if (senderQueue.Count > 0)
                 {
@@ -134,7 +149,6 @@ namespace TopicTrennerAPI.Service
                     client.Publish(mqttMessage.Topic, mqttMessage.Message, mqttMessage.QosLevel, mqttMessage.Retain);
                     Console.WriteLine(new StringBuilder("SEND# Topic: ").Append(mqttMessage.Topic));
                 }
-                yield return null;
             }
         }
 
@@ -154,8 +168,7 @@ namespace TopicTrennerAPI.Service
             topic = topic.ToLower();
 
             //this style for 3.5.Net
-            List<IMqttTopicReceiver> listReceiver = new List<IMqttTopicReceiver>();
-            if (this.DictTopicReceiver.TryGetValue(topic, out listReceiver))
+            if (this.DictTopicReceiver.TryGetValue(topic, out List<IMqttTopicReceiver> listReceiver))
             {
                 listReceiver.Add(receiver);
                 client.Subscribe(new string[] { topic }, new byte[] { MqttQOS_Level });
@@ -163,8 +176,10 @@ namespace TopicTrennerAPI.Service
             }
             else
             {
-                listReceiver = new List<IMqttTopicReceiver>();
-                listReceiver.Add(receiver);
+                listReceiver = new List<IMqttTopicReceiver>
+                {
+                    receiver
+                };
                 this.DictTopicReceiver.Add(topic, listReceiver);
 
                 client.Subscribe(new string[] { topic }, new byte[] { MqttQOS_Level });
@@ -172,23 +187,24 @@ namespace TopicTrennerAPI.Service
             }
         }
 
-        public string Hello()
-        {
-            return "Hallo from MqttConnector";
-        }
-
         /**
          * PublishMessage enqueues the Message of a Topic in the Queue and the message will automaticaly, concurrently sended
          */
         public void PublishMessage(string topic, string Message, EnumMqttQualityOfService MqttQOS_Level = EnumMqttQualityOfService.QOS_LEVEL_EXACTLY_ONCE, bool retain = false)
         {
-            Console.WriteLine("sending init");
             this.PublishMessage(topic, Message, (byte)MqttQOS_Level, retain);
         }
 
         public void PublishMessage(string topic, string Message, byte MqttQOS_Level, bool retain = false)
         {
+            Console.WriteLine("sending init");
             this.senderQueue.Enqueue(new MqttMsgPublishEventArgs(topic, System.Text.Encoding.UTF8.GetBytes(Message), false, MqttQOS_Level, retain));
+        }
+
+
+        public string Hello()
+        {
+            return "Hallo from MqttConnector";
         }
     }
 }

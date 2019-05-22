@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace TopicTrennerAPI.Interfaces
 {
-    interface IServerConfig
+    public interface IServerConfig
     {
         string GetServerIp();
 
