@@ -19,11 +19,6 @@ namespace TopicTrennerAPI.Service
         private Queue<MqttMsgPublishEventArgs> receiverQueue;
         private Queue<MqttMsgPublishEventArgs> senderQueue;
 
-        public MqttConnectorService()
-        {
-            Start();
-        }
-
         public MqttConnectorService(IServerConfig serverConfig)
         {
             Start(serverConfig);

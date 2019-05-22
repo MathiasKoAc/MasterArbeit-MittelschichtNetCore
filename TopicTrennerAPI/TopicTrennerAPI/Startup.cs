@@ -25,6 +25,7 @@ namespace TopicTrennerAPI
             services.AddDbContext<TodoContext>(opt =>
                 opt.UseInMemoryDatabase("TodoList"));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddScoped<IServerConfig, ServerConfigDummycs>();
             services.AddScoped<IMqttConnector, MqttConnectorService>();
         }
 
