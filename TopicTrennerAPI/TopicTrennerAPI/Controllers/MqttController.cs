@@ -38,17 +38,5 @@ namespace TopicTrennerAPI.Controllers
         {
             _mqttConnector.PublishMessage(mqtt.Topic, mqtt.Message, mqtt.QosLevel, mqtt.Retain);
         }
-
-        // PUT: api/Mqtt/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
     }
 }
