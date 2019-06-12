@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Exception\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 

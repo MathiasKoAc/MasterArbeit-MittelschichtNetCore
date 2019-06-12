@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TopicTrennerAPI.Interfaces;
+using TopicTrennerAPI.Models;
 
 namespace TopicTrennerAPI.Controllers
 {
@@ -27,9 +28,15 @@ namespace TopicTrennerAPI.Controllers
 
         // GET api/values/5
         [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+        public ActionResult<Rule> Get(int id)
         {
-            return "value";
+            //return "value";
+            //Testen...
+            Rule r = new Rule();
+            r.Active = true;
+            r.OutTopic = "out/1";
+            r.InTopic = TopicVertex.CreateTopicVertex("in/1");
+            return r;
         }
 
         // POST api/values
