@@ -7,14 +7,14 @@ namespace TopicTrennerAPI.Models
 {
     public class TopicVertex
     {
-        public TopicVertex FromVertex { get; set; }
-        private List<TopicVertex> ToVertexes;
-        public string Value { get; set; }    //topicPart
+        public TopicVertex ParentVertex { get; set; }
+        List<TopicVertex> ChildVertexes;
+        public string TopicPart { get; set; }    //topicPart
         public List<Rule> Rules { get; set; }
 
         public TopicVertex()
         {
-            this.ToVertexes = new List<TopicVertex>();
+            this.ChildVertexes = new List<TopicVertex>();
             this.Rules = new List<Rule>();
         }
 
@@ -23,25 +23,20 @@ namespace TopicTrennerAPI.Models
         {
             get
             {
-                if (this.FromVertex != null)
+                if (this.ParentVertex != null)
                 {
-                    return this.FromVertex.TopicChain +"/"+ Value;
+                    return this.ParentVertex.TopicChain +"/"+ TopicPart;
                 }
-                return Value;
+                return TopicPart;
             }
         }
-        /*
-        public override string ToString()
-        {
-            return this.TopicChain;
-        }
-        */
+
         public TopicVertex FindFirstTopicVertex()
         {
             TopicVertex mover = this;
-            while(this.FromVertex != null)
+            while(this.ParentVertex != null)
             {
-                mover = this.FromVertex;
+                mover = this.ParentVertex;
             }
             return mover;
         }
@@ -57,13 +52,28 @@ namespace TopicTrennerAPI.Models
                 tv = new TopicVertex();
                 if(last != null)
                 {
-                    tv.FromVertex = last;
-                    last.ToVertexes.Add(tv);
+                    tv.ParentVertex = last;
+                    last.ChildVertexes.Add(tv);
                 }
-                tv.Value = part;
+                tv.TopicPart = part;
                 last = tv;
             }
             return tv;
+        }
+
+        public void AddChildVertex(TopicVertex tv)
+        {
+            this.ChildVertexes.Add(tv);
+        }
+
+        public void RemoveChildVertex(TopicVertex tv)
+        {
+            this.ChildVertexes.Remove(tv);
+        }
+
+        public List<TopicVertex> GetChildVertexList()
+        {
+            return this.ChildVertexes;
         }
     }
 }

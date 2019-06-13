@@ -38,14 +38,53 @@ namespace TopicTrennerAPI.Service.RuleService
             //else if there is no, topic to match... do nothing
         }
 
-        private void treeWalk(byte[] message, string[] topicParts, int index, TopicVertex topicVertx)
+        private void TreeWalk(byte[] message, string[] topicPartsMessageIn, int topicPartIndex, TopicVertex topicVertxRule)
         {
-            if(topicVertx.Rules.Count > 0)
+            if(topicVertxRule.Rules.Count > 0)
             {
-                //TODO kümmer dich um die Regel...
+                CheckTheRule(message, topicPartsMessageIn, topicPartIndex, topicVertxRule);
             }
 
-            
+            // checking for new TopicVertex
+            List<TopicVertex> tvList = topicVertxRule.GetChildVertexList();
+            if(tvList.Count > 0)
+            {
+                topicPartIndex++;
+                foreach (TopicVertex tv in tvList)
+                {
+                    if(tv.TopicPart == topicPartsMessageIn[topicPartIndex] || tv.TopicPart == "#" || tv.TopicPart == "+")
+                    {
+                        TreeWalk(message, topicPartsMessageIn, topicPartIndex, tv);
+                    }
+                }
+            }
+        }
+
+        private void CheckTheRule(byte[] message, string[] topicPartsMessageIn, int topicPartIndex, TopicVertex topicVertxRule)
+        {
+            //wenn keine Rul da, dann gibt es nix zu tuen
+            if(topicVertxRule.Rules.Count == 0)
+            {
+                return;
+            }
+
+            //wenn # dann feuer
+            if (topicVertxRule.TopicPart == "#")
+            {
+                SendTheMessageByRule(message, topicPartsMessageIn, topicPartIndex, topicVertxRule);
+            }
+
+            //wenn der topicPart übereinstimmt und das der letzt Part ist dann feuer
+            if(topicPartsMessageIn.Count() == (topicPartIndex + 1)
+                && (topicPartsMessageIn[topicPartIndex] == topicVertxRule.TopicPart
+                    || topicPartsMessageIn[topicPartIndex] == "+"))
+            {
+                SendTheMessageByRule(message, topicPartsMessageIn, topicPartIndex, topicVertxRule);
+            }
+        }
+
+        private void SendTheMessageByRule(byte[] message, string[] topicPartsMessageIn, int topicPartIndex, TopicVertex topicVertxRule)
+        {
 
         }
     }
