@@ -9,11 +9,12 @@ namespace TopicTrennerAPI.Models
     {
         private string _outTopic;
         private string[] _outTopicParts = null;
+        private bool _outTopicHasWildcard = false;
 
         public TopicVertex InTopic { get; set; }
         
         public bool Active { get; set; }
-        public bool HasWildcard { get; }
+        public bool OutTopicHasWildcard { get { return _outTopicHasWildcard; } }
 
         public string OutTopic
         {
@@ -23,6 +24,7 @@ namespace TopicTrennerAPI.Models
                 _outTopic = value;
                 if(_outTopic.Contains('#') || _outTopic.Contains('+')) {
                     _outTopicParts = _outTopic.Split('/');
+                    this._outTopicHasWildcard = true;
                 }
             }
         }

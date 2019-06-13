@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+
 using TopicTrennerAPI.Models;
 using TopicTrennerAPI.Interfaces;
 
@@ -12,6 +13,8 @@ namespace TopicTrennerAPI.Service.RuleService
         IMqttConnector mqttCon;
         Dictionary<string, List<TopicVertex>> TopicRules;
         List<Rule> Rules;
+
+        public EnumMqttQualityOfService MqttQualityOfService = EnumMqttQualityOfService.QOS_LEVEL_AT_LEAST_ONCE;
 
         public void LoadRules()
         {
@@ -62,30 +65,80 @@ namespace TopicTrennerAPI.Service.RuleService
 
         private void CheckTheRule(byte[] message, string[] topicPartsMessageIn, int topicPartIndex, TopicVertex topicVertxRule)
         {
-            //wenn keine Rul da, dann gibt es nix zu tuen
+            // wenn keine Rul da, dann gibt es nix zu tuen
             if(topicVertxRule.Rules.Count == 0)
             {
                 return;
             }
 
-            //wenn # dann feuer
+            // wenn # dann feuer
             if (topicVertxRule.TopicPart == "#")
             {
-                SendTheMessageByRule(message, topicPartsMessageIn, topicPartIndex, topicVertxRule);
+                SendTheMessagesByRules(message, topicPartsMessageIn, topicVertxRule.Rules);
             }
 
-            //wenn der topicPart übereinstimmt und das der letzt Part ist dann feuer
+            // wenn der topicPart übereinstimmt und das der letzt Part ist dann feuer
             if(topicPartsMessageIn.Count() == (topicPartIndex + 1)
                 && (topicPartsMessageIn[topicPartIndex] == topicVertxRule.TopicPart
                     || topicPartsMessageIn[topicPartIndex] == "+"))
             {
-                SendTheMessageByRule(message, topicPartsMessageIn, topicPartIndex, topicVertxRule);
+                SendTheMessagesByRules(message, topicPartsMessageIn, topicVertxRule.Rules);
             }
         }
 
-        private void SendTheMessageByRule(byte[] message, string[] topicPartsMessageIn, int topicPartIndex, TopicVertex topicVertxRule)
+        private void SendTheMessagesByRules(byte[] message, string[] topicPartsMessageIn, List<Rule> Rules)
         {
+            foreach(Rule r in Rules)
+            {
+                if(!r.OutTopicHasWildcard)
+                {
+                    // normal senden
+                    this.mqttCon.PublishMessage(r.OutTopic, message, (byte) this.MqttQualityOfService);
+                } else
+                {
+                    SendMessageWithWildcardByRule(message, topicPartsMessageIn, r);
+                }
+            }
+        }
 
+        private void SendMessageWithWildcardByRule(byte[] message, string[] topicPartsMessageIn, Rule r)
+        {
+            // OutTopic zusammenbauen / Wildcard ersetzen
+            string[] topicPartsRegel = r.GetOutTopicParts();
+
+            // Die Message muss mindestens die Länge der Topics auf der Rechten-Regelseite haben
+            if (topicPartsMessageIn.Count() >= topicPartsRegel.Count())
+            {
+                StringBuilder topicBuild = new StringBuilder();
+
+                bool multiLevelWildModus = false;
+                int i = 0;
+                for (i = 0; i < topicPartsRegel.Count(); i++)
+                {
+                    if (topicPartsRegel[i].Equals("+"))
+                    {
+                        // + ersetzten mit Value von topic der Message
+                        topicBuild.Append(topicPartsMessageIn[i]);
+                    }
+                    else if (topicPartsRegel[i].Equals("#"))
+                    {
+                        // EXTREM SONNDERFALL DES TODES!
+                        multiLevelWildModus = true;
+                        break;
+                    }
+                    else
+                    {
+                        // weiter anhängen...
+                        topicBuild.Append(topicPartsRegel[i]);
+                    }
+                }
+
+                if(multiLevelWildModus)
+                {
+                    for(;i < topicPartsMessageIn.Count(); )
+                }
+                mqttCon.PublishMessage(topicBuild.ToString(), message, (byte)MqttQualityOfService);
+            }
         }
     }
 }

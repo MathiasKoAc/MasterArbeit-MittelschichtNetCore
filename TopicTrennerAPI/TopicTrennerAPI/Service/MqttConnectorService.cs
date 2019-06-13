@@ -192,10 +192,14 @@ namespace TopicTrennerAPI.Service
 
         public void PublishMessage(string topic, string Message, byte MqttQOS_Level, bool retain = false)
         {
-            Console.WriteLine("sending init");
-            this.senderQueue.Enqueue(new MqttMsgPublishEventArgs(topic, System.Text.Encoding.UTF8.GetBytes(Message), false, MqttQOS_Level, retain));
+            this.PublishMessage(topic, System.Text.Encoding.UTF8.GetBytes(Message), MqttQOS_Level, retain);
         }
 
+        public void PublishMessage(string topic, byte[] Message, byte MqttQOS_Level, bool retain = false)
+        {
+            Console.WriteLine("sending init");
+            this.senderQueue.Enqueue(new MqttMsgPublishEventArgs(topic, Message, false, MqttQOS_Level, retain));
+        }
 
         public string Hello()
         {
