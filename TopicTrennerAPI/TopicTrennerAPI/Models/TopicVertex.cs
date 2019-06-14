@@ -18,7 +18,11 @@ namespace TopicTrennerAPI.Models
             this.Rules = new List<Rule>();
         }
 
-
+        public TopicVertex(TopicVertex parenVertex, string topicPart) : this()
+        {
+            this.ParentVertex = parenVertex;
+            this.TopicPart = topicPart;
+        }
         public string TopicChain
         {
             get

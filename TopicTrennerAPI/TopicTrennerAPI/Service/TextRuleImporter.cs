@@ -17,23 +17,43 @@ namespace TopicTrennerAPI.Service
         public Dictionary<string, TopicVertex> LoadRules()
         {
             ///dicTv key ist TopicVertex.TopicChain also die TopicPartsKette bis inkl diesem TopicPart
-            Dictionary<string, TopicVertex> dicTv = new Dictionary<string, TopicVertex>();
-            List<SimpleRule> Rules = ReadToSimpleRuleList(a);
+            Dictionary<string, TopicVertex> topicRules = new Dictionary<string, TopicVertex>();
+            List<SimpleRule> rules = ReadToSimpleRuleList(a);
 
-            foreach(SimpleRule sr in Rules)
+            foreach(SimpleRule simpleRule in rules)
             {
-                if(sr.InTopic != null)
-                {
-                    string[] inTopicParts = sr.InTopic.Split("/");
-                    StringBuilder strBuilder = new StringBuilder();
-
-                    for(int i = 0; i < inTopicParts.Count(); i++)
-                    {
-                        strBuilder.Append(inTopicParts[i]);
-                    }
-                }
+                CreateTopicVertexChain(ref topicRules, simpleRule);
             }
-            return dicTv;
+            return topicRules;
+        }
+
+        private void CreateTopicVertexChain(ref Dictionary<string, TopicVertex> topicRules, SimpleRule simpleRule)
+        {
+            if (simpleRule.InTopic != null)
+            {
+                string[] inTopicParts = simpleRule.InTopic.Split("/");
+                StringBuilder strBuilder = new StringBuilder();
+                TopicVertex lastVertex = null;
+                TopicVertex aktualVertex = null;
+
+                for (int i = 0; i < inTopicParts.Count(); i++)
+                {
+                    strBuilder.Append(inTopicParts[i]);
+                    // wenn das aktuelle Vertex nicht existiert (identifiert bei TopicChain), dann erstelle ein neues
+                    if (!topicRules.TryGetValue(strBuilder.ToString(), out aktualVertex))
+                    {
+                        // erstelle Vertex
+                        aktualVertex = new TopicVertex(lastVertex, inTopicParts[i]);
+                        if(lastVertex != null)
+                        {
+                            lastVertex.AddChildVertex(aktualVertex);
+                        }
+                        topicRules.Add(aktualVertex.TopicChain, aktualVertex);
+                    }
+                    strBuilder.Append("/");
+                }
+                aktualVertex.Rules.Add(new Rule(aktualVertex, simpleRule));
+            }
         }
 
         // Deserialize a JSON stream to a List<SimpleRule> object.  

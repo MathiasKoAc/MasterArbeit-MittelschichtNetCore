@@ -29,6 +29,24 @@ namespace TopicTrennerAPI.Models
             }
         }
 
+        public Rule()
+        {
+        }
+
+        public Rule(TopicVertex inTopic, string outTopic, bool active)
+        {
+            InTopic = inTopic;
+            OutTopic = outTopic;
+            Active = active;
+        }
+
+        public Rule(TopicVertex inTopic, SimpleRule simpleRule)
+        {
+            InTopic = inTopic;
+            OutTopic = simpleRule.OutTopic;
+            Active = simpleRule.Active;
+        }
+
         public string[] GetOutTopicParts()
         {
             if(_outTopicParts == null)
