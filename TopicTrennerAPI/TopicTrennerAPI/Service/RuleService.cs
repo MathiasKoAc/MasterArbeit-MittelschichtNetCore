@@ -6,13 +6,14 @@ using System.Linq;
 using TopicTrennerAPI.Models;
 using TopicTrennerAPI.Interfaces;
 
-namespace TopicTrennerAPI.Service.RuleService
+namespace TopicTrennerAPI.Service
 {
     public class RuleService : IMqttTopicReceiver
     {
         IMqttConnector mqttCon;
-        Dictionary<string, List<TopicVertex>> TopicRules;
-        List<Rule> Rules;
+        ///TopicRules key ist TopicVertex.TopicChain also die TopicPartsKette bis inkl diesem TopicPart
+        Dictionary<string, TopicVertex> TopicRules;
+        // List<Rule> Rules;
 
         public EnumMqttQualityOfService MqttQualityOfService = EnumMqttQualityOfService.QOS_LEVEL_AT_LEAST_ONCE;
 
@@ -23,22 +24,15 @@ namespace TopicTrennerAPI.Service.RuleService
 
         public void OnReceivedMessage(string topic, byte[] message)
         {
+            string[] topicParts = topic.Trim().ToLower().Split("/");
+
             //TODO topic check wie im Bsp von GITHUB
-
-            //TODO sonderfall #-Regeln definiert...
-            if(TopicRules.TryGetValue("#", out List<TopicVertex> value))
+            if(topicParts[0] != null && TopicRules.TryGetValue(topicParts[0], out TopicVertex tv))
             {
-
-            }
-
-            //TODO walk throu the tree
-            string[] topicParts = topic.Split("/");
-            if(topicParts[0] != null && TopicRules.TryGetValue(topicParts[0], out List<TopicVertex> topicVertexes))
-            {
-                
+                TreeWalk(message, topicParts, 0, tv);
             }
             
-            //else if there is no, topic to match... do nothing
+            //if there is no topic to match... do nothing
         }
 
         private void TreeWalk(byte[] message, string[] topicPartsMessageIn, int topicPartIndex, TopicVertex topicVertxRule)
@@ -122,7 +116,7 @@ namespace TopicTrennerAPI.Service.RuleService
                     }
                     else if (topicPartsRegel[i].Equals("#"))
                     {
-                        // EXTREM SONNDERFALL DES TODES!
+                        // Break aus der Loop
                         multiLevelWildModus = true;
                         break;
                     }
@@ -133,9 +127,13 @@ namespace TopicTrennerAPI.Service.RuleService
                     }
                 }
 
+                //Sonderfall wenn # gefunden wurde
                 if(multiLevelWildModus)
                 {
-                    for(;i < topicPartsMessageIn.Count(); )
+                    for(;i < topicPartsMessageIn.Count(); i++) {
+                        // TODO go over the MessageParts and replace the #
+                        topicBuild.Append(topicPartsMessageIn[i]);
+                    }
                 }
                 mqttCon.PublishMessage(topicBuild.ToString(), message, (byte)MqttQualityOfService);
             }
