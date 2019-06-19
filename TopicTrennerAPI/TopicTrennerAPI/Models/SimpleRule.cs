@@ -7,6 +7,7 @@ namespace TopicTrennerAPI.Models
 {
     public class SimpleRule
     {
+        public int ID { get; set; }
         public string InTopic { get; set; }
         public string OutTopic { get; set; }
         public bool Active { get; set; }

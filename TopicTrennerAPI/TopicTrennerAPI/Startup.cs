@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using TopicTrennerAPI.Models;
 using TopicTrennerAPI.Interfaces;
 using TopicTrennerAPI.Service;
+using TopicTrennerAPI.Data;
 
 namespace TopicTrennerAPI
 {
@@ -22,8 +23,9 @@ namespace TopicTrennerAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<TodoContext>(opt =>
-                opt.UseInMemoryDatabase("TodoList"));
+            services.AddDbContext<DbTopicTrennerContext>(
+                opt =>opt.UseMySQL("Server=127.0.0.1; Port=3306; Database=smile; user=root; Pwd=lfasdFl3sa6hRdlk5hVd3lkHjsa; charset=utf8;")
+            );
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddScoped<IServerConfig, ServerConfigDummycs>();
             services.AddScoped<IMqttConnector, MqttConnectorService>();
