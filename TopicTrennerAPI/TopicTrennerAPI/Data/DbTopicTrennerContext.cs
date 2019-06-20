@@ -12,10 +12,18 @@ namespace TopicTrennerAPI.Data
         }
 
         public DbSet<SimpleRule> Rules { get; set; }
+        public DbSet<Session> Sessions { get; set; }
+        public DbSet<SessionSimpleRule> SessionSimpleRules { get; set; }
+        public DbSet<SimpleRuleSubject> SimpleRuleSubjects { get; set; }
+        public DbSet<Subject> Subjects { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<SimpleRule>().ToTable("Rule");
+            modelBuilder.Entity<Session>().ToTable("Session");
+            modelBuilder.Entity<SessionSimpleRule>().ToTable("SessionSimpleRule");
+            modelBuilder.Entity<SimpleRuleSubject>().ToTable("SimpleRuleSubject");
+            modelBuilder.Entity<Subject>().ToTable("Subject");
         }
     }
 }

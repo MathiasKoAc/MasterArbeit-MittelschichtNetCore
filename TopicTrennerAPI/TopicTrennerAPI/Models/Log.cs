@@ -7,6 +7,7 @@ namespace TopicTrennerAPI.Models
 {
     public class Log
     {
+        public int ID { get; set; }
         public Session session { get; set; }
     }
 }
