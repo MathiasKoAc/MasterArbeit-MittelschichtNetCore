@@ -8,7 +8,7 @@ namespace TopicTrennerAPI.Models
     public class Session
     {
         public int ID { get; set; }
-        public List<SessionSimpleRule> sessionSimpleRules { get; set; }
-        public List<Log> logs { get; set; }
+        public List<SessionSimpleRule> SessionSimpleRules { get; set; }
+        public List<Log> Logs { get; set; }
     }
 }

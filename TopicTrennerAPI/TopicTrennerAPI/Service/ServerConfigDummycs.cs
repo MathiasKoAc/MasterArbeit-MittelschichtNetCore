@@ -7,17 +7,20 @@ namespace TopicTrennerAPI.Service
     {
         public string GetPassword()
         {
-            return "HomeSmart";
+            //return "HomeSmart";
+            return "";
         }
 
         public string GetServerIp()
         {
-            return "192.168.0.2";
+            //return "192.168.0.2";
+            return "192.168.178.78";
         }
 
         public string GetUsername()
         {
-            return "mqtt";
+            //return "mqtt";
+            return "";
         }
     }
 }

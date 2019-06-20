@@ -12,8 +12,8 @@ namespace TopicTrennerAPI.Models
         public string OutTopic { get; set; }
         public bool Active { get; set; }
 
-        public List<SimpleRuleSubject> simpleRuleSubjects { get; set; }
-        public List<SessionSimpleRule> sessionSimpleRules { get; set; }
-        public EnumSimpleRuleTyp simpleRuleTyp { get; set; }
+        public List<SimpleRuleSubject> SimpleRuleSubjects { get; set; }
+        public List<SessionSimpleRule> SessionSimpleRules { get; set; }
+        public EnumSimpleRuleTyp SimpleRuleTyp { get; set; }
     }
 }
