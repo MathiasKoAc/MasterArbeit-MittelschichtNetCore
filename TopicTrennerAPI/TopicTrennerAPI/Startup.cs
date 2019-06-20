@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
-using TopicTrennerAPI.Models;
 using TopicTrennerAPI.Interfaces;
 using TopicTrennerAPI.Service;
 using TopicTrennerAPI.Data;

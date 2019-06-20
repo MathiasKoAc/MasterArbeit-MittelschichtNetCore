@@ -5,6 +5,7 @@ using System.Linq;
 
 using TopicTrennerAPI.Models;
 using TopicTrennerAPI.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace TopicTrennerAPI.Service
 {
@@ -14,12 +15,13 @@ namespace TopicTrennerAPI.Service
         ///TopicRules key ist TopicVertex.TopicChain also die TopicPartsKette bis inkl diesem TopicPart
         Dictionary<string, TopicVertex> TopicRules;
         // List<Rule> Rules;
+        //DbContext dbConntext;
 
         public EnumMqttQualityOfService MqttQualityOfService = EnumMqttQualityOfService.QOS_LEVEL_AT_LEAST_ONCE;
 
         public void LoadRules()
         {
-
+            
         }
 
         public void OnReceivedMessage(string topic, byte[] message)
