@@ -15,8 +15,8 @@ namespace TopicTrennerAPI
     {
         public static void Main(string[] args)
         {
-            var context = new DbTopicTrennerContext();
-            context.Database.EnsureCreated();
+            // var context = new DbTopicTrennerContext();
+            // context.Database.EnsureCreated();
             CreateWebHostBuilder(args).Build().Run();
         }
 

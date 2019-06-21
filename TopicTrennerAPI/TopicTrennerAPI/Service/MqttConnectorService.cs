@@ -52,12 +52,15 @@ namespace TopicTrennerAPI.Service
                 {
                     this.StopInnerCoroutines();
                     Console.WriteLine("ERROR: MqttConnector can't Connect to the Broker. Check _serverConfig IP, Username, Password.");
+                    throw new Exception("ERROR: MqttConnector can't Connect to the Broker. Check _serverConfig IP, Username, Password.");
                 }
             }
             catch (Exception)
             {
                 this.StopInnerCoroutines();
-                Console.WriteLine(new StringBuilder("ERROR: MqttConnector can't Connect to the Broker on IP: ").Append(_serverConfig.GetServerIp()));
+                string errorstr = new StringBuilder("ERROR: MqttConnector can't Connect to the Broker on IP: ").Append(_serverConfig.GetServerIp()).ToString();
+                Console.WriteLine(errorstr);
+                throw new Exception(errorstr);
             }
 
         }

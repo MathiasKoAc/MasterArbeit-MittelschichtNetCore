@@ -21,6 +21,7 @@ namespace TopicTrennerAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            this.SetupDbCorrect(Configuration.GetConnectionString("DbDefaultConnection"));
             services.AddDbContext<DbTopicTrennerContext>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddScoped<IServerConfig, ServerConfigDummycs>();
@@ -41,6 +42,13 @@ namespace TopicTrennerAPI
 
             app.UseHttpsRedirection();
             app.UseMvc();
+        }
+
+        private void SetupDbCorrect(string config)
+        {
+            DbTopicTrennerContext.DbConfigString = config;
+            var context = new DbTopicTrennerContext();
+            context.Database.EnsureCreated();
         }
     }
 }

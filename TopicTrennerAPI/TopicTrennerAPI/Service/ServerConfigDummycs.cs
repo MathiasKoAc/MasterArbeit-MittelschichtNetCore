@@ -1,26 +1,34 @@
 ﻿using System;
 using TopicTrennerAPI.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace TopicTrennerAPI.Service
 {
     public class ServerConfigDummycs : IServerConfig
     {
+        private string _password;
+        private string _ip;
+        private string _username;
+
+        public ServerConfigDummycs (IConfiguration config) {
+            _password = config.GetConnectionString("MqttDefaulConnectionPasswort");
+            _ip = config.GetConnectionString("MqttDefaulConnectionServer");
+            _username = config.GetConnectionString("MqttDefaulConnectionUser");
+        }
+
         public string GetPassword()
         {
-            //return "HomeSmart";
-            return "";
+            return _password;
         }
 
         public string GetServerIp()
         {
-            //return "192.168.0.2";
-            return "192.168.178.78";
+            return _ip;
         }
 
         public string GetUsername()
         {
-            //return "mqtt";
-            return "";
+            return _username;
         }
     }
 }

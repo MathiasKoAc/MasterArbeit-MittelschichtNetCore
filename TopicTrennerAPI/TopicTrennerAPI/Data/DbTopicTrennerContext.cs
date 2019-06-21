@@ -1,14 +1,28 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System;
 using TopicTrennerAPI.Models;
+using Microsoft.Extensions.Configuration;
 
 
 namespace TopicTrennerAPI.Data
 {
     public class DbTopicTrennerContext : DbContext
     {
+        private static string _dbConfigStr = null;
+        public static string DbConfigString {
+            set
+            {
+                _dbConfigStr = value;
+            }
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseMySQL("Server=127.0.0.1; Port=3306; Database=smile; user=root; Pwd=lfasdFl3sa6hRdlk5hVd3lkHjsa; charset=utf8;");
+            if(_dbConfigStr == null)
+            {
+                throw new Exception("DB Config not set correct please setup DbConfigString");
+            }
+            optionsBuilder.UseMySQL(_dbConfigStr);//"Server=127.0.0.1; Port=3306; Database=smile; user=root; Pwd=lfasdFl3sa6hRdlk5hVd3lkHjsa; charset=utf8;");
         }
 
         public DbSet<SimpleRule> Rules { get; set; }
