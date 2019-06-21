@@ -27,12 +27,12 @@ namespace TopicTrennerAPI.Controllers
 
         // GET: api/Mqtt/5
         [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
+        public MqttMessage Get(int id)
         {
-            return "value";
+            return new MqttMessage();
         }
 
-        // POST: api/Mqtt
+        // posT: api/Mqtt
         [HttpPost]
         public void Post(MqttMessage mqtt)
         {

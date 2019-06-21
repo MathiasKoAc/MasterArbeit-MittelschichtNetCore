@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using TopicTrennerAPI.Models;
-using Microsoft.Extensions.Configuration;
 
 
 namespace TopicTrennerAPI.Data
@@ -22,7 +21,7 @@ namespace TopicTrennerAPI.Data
             {
                 throw new Exception("DB Config not set correct please setup DbConfigString");
             }
-            optionsBuilder.UseMySQL(_dbConfigStr);//"Server=127.0.0.1; Port=3306; Database=smile; user=root; Pwd=lfasdFl3sa6hRdlk5hVd3lkHjsa; charset=utf8;");
+            optionsBuilder.UseMySql(_dbConfigStr);//UseInMemoryDatabase("SmileTEST"); //"Server=127.0.0.1; Port=3306; Database=smile; user=root; Pwd=lfasdFl3sa6hRdlk5hVd3lkHjsa; charset=utf8;");
         }
 
         public DbSet<SimpleRule> Rules { get; set; }

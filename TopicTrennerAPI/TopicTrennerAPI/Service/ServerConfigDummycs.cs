@@ -6,9 +6,9 @@ namespace TopicTrennerAPI.Service
 {
     public class ServerConfigDummycs : IServerConfig
     {
-        private string _password;
-        private string _ip;
-        private string _username;
+        private readonly string _password;
+        private readonly string _ip;
+        private readonly string _username;
 
         public ServerConfigDummycs (IConfiguration config) {
             _password = config.GetConnectionString("MqttDefaulConnectionPasswort");
