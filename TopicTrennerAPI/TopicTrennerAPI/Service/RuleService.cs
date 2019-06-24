@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace TopicTrennerAPI.Service
 {
-    public class RuleService : IMqttTopicReceiver
+    public class RuleService : IMqttTopicReceiver, IControlRules
     {
         IMqttConnector mqttCon;
         ///TopicRules key ist TopicVertex.TopicChain also die TopicPartsKette bis inkl diesem TopicPart
@@ -139,6 +139,21 @@ namespace TopicTrennerAPI.Service
                 }
                 mqttCon.PublishMessage(topicBuild.ToString(), message, (byte)MqttQualityOfService);
             }
+        }
+
+        public void StartRuleService()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void StopRuleService()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReloadRules()
+        {
+            throw new NotImplementedException();
         }
     }
 }
