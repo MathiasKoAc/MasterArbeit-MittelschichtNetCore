@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 
-namespace TopicTrennerAPI.Lib
+namespace TopicTrennerAPI.Service
 {
     public class TopicRuleFactory : ICreateTopicRulesFromSimpleRules
     {
