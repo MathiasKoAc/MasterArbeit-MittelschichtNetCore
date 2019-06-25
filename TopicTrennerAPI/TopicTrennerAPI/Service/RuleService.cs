@@ -9,19 +9,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace TopicTrennerAPI.Service
 {
-    public class RuleService : IMqttTopicReceiver, IControlRules
+    public class RuleEvaluationService : IMqttTopicReceiver, IControlRules
     {
         IMqttConnector mqttCon;
         ///TopicRules key ist TopicVertex.TopicChain also die TopicPartsKette bis inkl diesem TopicPart
         Dictionary<string, TopicVertex> TopicRules;
-        // List<Rule> Rules;
-        //DbContext dbConntext;
+        ILoadTopicRules TopicRuleLoader;
 
         public EnumMqttQualityOfService MqttQualityOfService = EnumMqttQualityOfService.QOS_LEVEL_AT_LEAST_ONCE;
 
-        public void LoadRules()
+
+        public RuleEvaluationService(ILoadTopicRules TopicRuleLoader)
         {
-            
+            this.TopicRuleLoader = TopicRuleLoader;
         }
 
         public void OnReceivedMessage(string topic, byte[] message)
@@ -141,17 +141,17 @@ namespace TopicTrennerAPI.Service
             }
         }
 
-        public void StartRuleService()
+        public void StartRuleService(int sessionId)
         {
             throw new NotImplementedException();
         }
 
-        public void StopRuleService()
+        public void StopRuleService(int sessionId)
         {
             throw new NotImplementedException();
         }
 
-        public void ReloadRules()
+        public void ReloadRules(int sessionId)
         {
             throw new NotImplementedException();
         }

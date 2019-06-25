@@ -4,8 +4,8 @@ using TopicTrennerAPI.Models;
 
 namespace TopicTrennerAPI.Interfaces
 {
-    interface ILoadTopicRules
+    public interface ILoadTopicRules
     {
-        Dictionary<string, TopicVertex> LoadRules();
+        Dictionary<string, TopicVertex> LoadRules(int sessionId);
     }
 }

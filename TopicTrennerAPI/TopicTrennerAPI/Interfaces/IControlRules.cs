@@ -7,8 +7,8 @@ namespace TopicTrennerAPI.Interfaces
 {
     interface IControlRules
     {
-        void StartRuleService();
-        void StopRuleService();
-        void ReloadRules();
+        void StartRuleService(int sessionId);
+        void StopRuleService(int sessionId);
+        void ReloadRules(int sessionId);
     }
 }

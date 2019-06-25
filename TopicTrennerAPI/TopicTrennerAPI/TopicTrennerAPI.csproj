@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <Folder Include="Exception\" />
+    <Folder Include="Lib\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 

@@ -15,7 +15,7 @@ namespace TopicTrennerAPI.Service
         public ICreateTopicRulesFromSimpleRules topicRuleCreater;
         string a = "[ {\"InTopic\":\"in/VR/Haus/Etage1\", \"OutTopic\":\"in/AR/Haus/Etage1\", \"Active\":true}, {\"InTopic\":\"in/VR/Haus/Etage2\", \"OutTopic\":\"in/AR/Haus/Etage2\", \"Active\":true}, {\"InTopic\":\"in/VR/Haus/Etage3\", \"OutTopic\":\"in/AR/Haus/Etage3\", \"Active\":true} ]";
 
-        public Dictionary<string, TopicVertex> LoadRules()
+        public Dictionary<string, TopicVertex> LoadRules(int sessionId)
         {
             ///dicTv key ist TopicVertex.TopicChain also die TopicPartsKette bis inkl diesem TopicPart
             Dictionary<string, TopicVertex> topicRules = new Dictionary<string, TopicVertex>();
