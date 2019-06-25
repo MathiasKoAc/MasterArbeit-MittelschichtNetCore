@@ -11,5 +11,7 @@ namespace TopicTrennerAPI.Models
         public Subject Subject { get; set; }
         public SimpleRule SimpleRule { get; set; }
         public EnumBindingTyp BindingTyp {get; set; }
+        public int SimpleRuleID { get; set; }
+        public int SubjectID { get; set; }
     }
 }

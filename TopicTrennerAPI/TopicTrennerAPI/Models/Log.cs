@@ -9,5 +9,6 @@ namespace TopicTrennerAPI.Models
     {
         public int ID { get; set; }
         public Session Session { get; set; }
+        public int SessionID { get; set; }
     }
 }
