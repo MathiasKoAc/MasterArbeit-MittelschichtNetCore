@@ -32,7 +32,7 @@ namespace TopicTrennerAPI.Controllers
         }
 
         // GET: api/SessionRun/5
-        [HttpGet("{id}", Name = "Get")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<SessionRun>> Get(int id)
         {
             if (_context.SessionRuns.Count() > 0)

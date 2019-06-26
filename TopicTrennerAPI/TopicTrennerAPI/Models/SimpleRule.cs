@@ -13,7 +13,8 @@ namespace TopicTrennerAPI.Models
         public bool Active { get; set; }
 
         public List<SimpleRuleSubject> SimpleRuleSubjects { get; set; }
-        public List<SessionSimpleRule> SessionSimpleRules { get; set; }
+        public Session Session { get; set; }
+        public int SessionID { get; set; }
         public EnumSimpleRuleTyp SimpleRuleTyp { get; set; }
     }
 }

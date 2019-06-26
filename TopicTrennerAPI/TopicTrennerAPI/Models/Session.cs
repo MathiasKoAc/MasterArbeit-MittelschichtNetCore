@@ -8,9 +8,9 @@ namespace TopicTrennerAPI.Models
     public class Session
     {
         public int ID { get; set; }
-        public List<SessionSimpleRule> SessionSimpleRules { get; set; }
         public DateTime DateCreated { get; set; } 
         public List<SessionRun> SessionRuns { get; set; }
+        public List<SimpleRule> SimpleRules { get; set; }
 
         public bool IsActive()
         {
