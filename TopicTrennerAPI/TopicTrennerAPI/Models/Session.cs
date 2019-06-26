@@ -11,6 +11,6 @@ namespace TopicTrennerAPI.Models
         public List<SessionSimpleRule> SessionSimpleRules { get; set; }
         public List<Log> Logs { get; set; }
         public DateTime DateCreated { get; set; } 
-        public DateTime DateUsed { get; set; }
+        //public DateTime DateUsed { get; set; }
     }
 }

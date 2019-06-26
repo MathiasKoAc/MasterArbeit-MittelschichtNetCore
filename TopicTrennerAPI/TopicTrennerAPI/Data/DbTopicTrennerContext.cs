@@ -29,6 +29,7 @@ namespace TopicTrennerAPI.Data
         public DbSet<SessionSimpleRule> SessionSimpleRules { get; set; }
         public DbSet<SimpleRuleSubject> SimpleRuleSubjects { get; set; }
         public DbSet<Subject> Subjects { get; set; }
+        public DbSet<SessionRun> SessionRuns { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -37,6 +38,7 @@ namespace TopicTrennerAPI.Data
             modelBuilder.Entity<SessionSimpleRule>().ToTable("SessionSimpleRule");
             modelBuilder.Entity<SimpleRuleSubject>().ToTable("SimpleRuleSubject");
             modelBuilder.Entity<Subject>().ToTable("Subject");
+            modelBuilder.Entity<SessionRun>().ToTable("SessionRun");
         }
     }
 }

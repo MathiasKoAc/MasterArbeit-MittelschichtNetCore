@@ -17,13 +17,8 @@ namespace TopicTrennerAPI.Service
         ///TopicRules key ist TopicVertex.TopicChain also die TopicPartsKette bis inkl diesem TopicPart
         Dictionary<string, TopicVertex> TopicRules;
 
-        bool _active = false;
-        public bool active {
-            get
-            {
-                return _active;
-            }
-        }
+        int _sessionId = int.MinValue;
+        public bool active { get; private set; } = false;
         public EnumMqttQualityOfService MqttQualityOfService = EnumMqttQualityOfService.QOS_LEVEL_AT_LEAST_ONCE;
 
 
@@ -155,21 +150,38 @@ namespace TopicTrennerAPI.Service
             }
         }
 
-        public void StartRuleService(int sessionId)
+        public void StartRuleSession(int sessionId)
         {
             TopicRules = TopicRuleLoader.LoadRules(sessionId);
-            _active = true;
+            _sessionId = sessionId;
+            active = true;
         }
 
-        public void StopRuleService(int sessionId)
+        public bool StopRuleSession(int sessionId)
         {
-            _active = false;
+            if(_sessionId != int.MinValue && _sessionId != sessionId)
+            {
+                return false;
+            }
+            active = false;
+            _sessionId = int.MinValue;
+            return true;
         }
 
-        public void ReloadRules(int sessionId)
+        public bool ReloadRules(int sessionId)
         {
+            if (_sessionId != int.MinValue && _sessionId != sessionId)
+            {
+                return false;
+            }
             TopicRules = TopicRuleLoader.LoadRules(sessionId);
-            _active = true;
+            active = true;
+            return true;
+        }
+
+        public int GetSessionId()
+        {
+            return _sessionId;
         }
     }
 }

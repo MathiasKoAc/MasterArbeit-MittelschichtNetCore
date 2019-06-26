@@ -14,6 +14,8 @@ namespace TopicTrennerAPI.Controllers
     [ApiController]
     public class RuleController : ControllerBase
     {
+        //Controller for Model typ SimpleRule
+
         DbTopicTrennerContext _context;
 
         public RuleController(DbTopicTrennerContext context)
