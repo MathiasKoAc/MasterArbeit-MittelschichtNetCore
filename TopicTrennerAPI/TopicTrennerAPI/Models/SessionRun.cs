@@ -10,6 +10,7 @@ namespace TopicTrennerAPI.Models
         public int ID { get; set; }
         public Session Session { get; set; }
         public int SessionID { get; set; }
+        public List<Log> Logs { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime StopTime { get; set; }
         public bool Active { get; set; }

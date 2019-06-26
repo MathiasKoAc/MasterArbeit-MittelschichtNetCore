@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using TopicTrennerAPI.Models;
 using TopicTrennerAPI.Data;
-using Microsoft.EntityFrameworkCore;
+using TopicTrennerAPI.Interfaces;
 
 namespace TopicTrennerAPI.Controllers
 {
@@ -17,10 +17,12 @@ namespace TopicTrennerAPI.Controllers
         //Controller for Model typ SimpleRule
 
         DbTopicTrennerContext _context;
+        IControlRules _ctrlRuleSession;
 
-        public RuleController(DbTopicTrennerContext context)
+        public RuleController(DbTopicTrennerContext context, IControlRules ctrlRuleSession)
         {
             _context = context;
+            _ctrlRuleSession = ctrlRuleSession;
         }
 
         // GET: api/Rule
@@ -50,7 +52,9 @@ namespace TopicTrennerAPI.Controllers
         public void Post(SimpleRule sRule)
         {
             _context.Rules.Add(sRule);
-            _context.SaveChangesAsync();
+            _context.SaveChanges();
+            
+            //_context.Rules.Include(ru => ru.SessionSimpleRules,).Where(r => r.ID = sRule.ID)
         }
 
         // PUT: api/Rule/5

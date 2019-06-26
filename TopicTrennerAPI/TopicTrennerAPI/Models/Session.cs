@@ -9,8 +9,19 @@ namespace TopicTrennerAPI.Models
     {
         public int ID { get; set; }
         public List<SessionSimpleRule> SessionSimpleRules { get; set; }
-        public List<Log> Logs { get; set; }
         public DateTime DateCreated { get; set; } 
-        //public DateTime DateUsed { get; set; }
+        public List<SessionRun> SessionRuns { get; set; }
+
+        public bool IsActive()
+        {
+            foreach(SessionRun sr in SessionRuns)
+            {
+                if(sr.Active)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }
