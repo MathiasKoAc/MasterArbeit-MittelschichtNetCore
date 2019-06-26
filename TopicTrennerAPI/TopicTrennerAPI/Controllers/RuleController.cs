@@ -53,8 +53,12 @@ namespace TopicTrennerAPI.Controllers
         {
             _context.Rules.Add(sRule);
             _context.SaveChanges();
-            
-            //_context.Rules.Include(ru => ru.SessionSimpleRules,).Where(r => r.ID = sRule.ID)
+
+            Session ses = _context.Sessions.Where(s => s.ID == sRule.SessionID).First();
+            if(ses.IsActive())
+            {
+                _ctrlRuleSession.ReloadRules(ses.ID);
+            }
         }
 
         // PUT: api/Rule/5
@@ -67,7 +71,13 @@ namespace TopicTrennerAPI.Controllers
             }
 
             _context.Entry(sRule).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
+
+            Session ses = _context.Sessions.Where(s => s.ID == sRule.SessionID).First();
+            if (ses.IsActive())
+            {
+                _ctrlRuleSession.ReloadRules(ses.ID);
+            }
             return NoContent();
         }
 
