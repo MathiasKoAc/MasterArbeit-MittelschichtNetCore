@@ -31,8 +31,16 @@ namespace TopicTrennerAPI.Service
 
         private List<SimpleRule> ReadToSimpleRuleList(int sessionId)
         {
-            //var rules = dbContext.Rules.Where(r => r.SessionSimpleRules. == sessionId).Include(sr => sr.SimpleRule);
-            return new List<SimpleRule>();
+            HashSet<SimpleRule> rules = new HashSet<SimpleRule>();
+
+            var sessionSimpleRules = dbContext.SessionSimpleRules.Include(sr => sr.SimpleRule).Where(sr => sr.SessionID == sessionId);
+
+            foreach(SessionSimpleRule ssr in sessionSimpleRules)
+            {
+                rules.Add(ssr.SimpleRule);
+            }
+
+            return rules.ToList<SimpleRule>();
         }
     }
 }

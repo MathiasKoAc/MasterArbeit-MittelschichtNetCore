@@ -12,20 +12,34 @@ namespace TopicTrennerAPI.Service
     public class RuleEvaluationService : IMqttTopicReceiver, IControlRules
     {
         IMqttConnector mqttCon;
-        ///TopicRules key ist TopicVertex.TopicChain also die TopicPartsKette bis inkl diesem TopicPart
-        Dictionary<string, TopicVertex> TopicRules;
         ILoadTopicRules TopicRuleLoader;
 
+        ///TopicRules key ist TopicVertex.TopicChain also die TopicPartsKette bis inkl diesem TopicPart
+        Dictionary<string, TopicVertex> TopicRules;
+
+        bool _active = false;
+        public bool active {
+            get
+            {
+                return _active;
+            }
+        }
         public EnumMqttQualityOfService MqttQualityOfService = EnumMqttQualityOfService.QOS_LEVEL_AT_LEAST_ONCE;
 
 
-        public RuleEvaluationService(ILoadTopicRules TopicRuleLoader)
+        public RuleEvaluationService(IMqttConnector mqttConnector, ILoadTopicRules TopicRuleLoader)
         {
+            this.mqttCon = mqttConnector;
             this.TopicRuleLoader = TopicRuleLoader;
         }
 
         public void OnReceivedMessage(string topic, byte[] message)
         {
+            if(!active)
+            {
+                return;
+            }
+
             string[] topicParts = topic.Trim().ToLower().Split("/");
 
             //TODO topic check wie im Bsp von GITHUB
@@ -143,17 +157,19 @@ namespace TopicTrennerAPI.Service
 
         public void StartRuleService(int sessionId)
         {
-            throw new NotImplementedException();
+            TopicRules = TopicRuleLoader.LoadRules(sessionId);
+            _active = true;
         }
 
         public void StopRuleService(int sessionId)
         {
-            throw new NotImplementedException();
+            _active = false;
         }
 
         public void ReloadRules(int sessionId)
         {
-            throw new NotImplementedException();
+            TopicRules = TopicRuleLoader.LoadRules(sessionId);
+            _active = true;
         }
     }
 }
