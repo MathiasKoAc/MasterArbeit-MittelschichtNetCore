@@ -20,18 +20,18 @@ namespace TopicTrennerAPI.Service
             dbContext = dbContexT;
         }
 
-        public Dictionary<string, TopicVertex> LoadRules(int sessionId)
+        public Dictionary<string, TopicVertex> LoadRules(int sessionId, EnumSimpleRuleTyp ruleTyp = EnumSimpleRuleTyp.access)
         {
             ///dicTv key ist TopicVertex.TopicChain also die TopicPartsKette bis inkl diesem TopicPart
             Dictionary<string, TopicVertex> topicRules = new Dictionary<string, TopicVertex>();
 
-            topicRuleCreater.CreateTopicRulesFromSimpleRules(ref topicRules, ReadToSimpleRuleList(sessionId));
+            topicRuleCreater.CreateTopicRulesFromSimpleRules(ref topicRules, ReadToSimpleRuleList(sessionId, ruleTyp));
             return topicRules;
         }
 
-        private List<SimpleRule> ReadToSimpleRuleList(int sessionId)
+        private List<SimpleRule> ReadToSimpleRuleList(int sessionId, EnumSimpleRuleTyp ruleTyp = EnumSimpleRuleTyp.access)
         {
-            var rules = dbContext.Rules.Where(r => r.SessionID == sessionId);
+            var rules = dbContext.Rules.Where(r => r.SessionID == sessionId && r.SimpleRuleTyp.Equals(ruleTyp));
             return rules.ToList();
         }
     }

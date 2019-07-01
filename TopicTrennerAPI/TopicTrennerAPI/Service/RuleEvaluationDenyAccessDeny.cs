@@ -9,20 +9,24 @@ using Microsoft.EntityFrameworkCore;
 
 namespace TopicTrennerAPI.Service
 {
-    public class RuleEvaluationService : IMqttTopicReceiver, IControlRules
+    //alternativ Implementierung von RuleEvaluationService um DenyAccessDeny zu ermöglichen
+    public class RuleEvaluationDenyAccessDeny : IMqttTopicReceiver, IControlRules
     {
         IMqttConnector mqttCon;
         ILoadTopicRules TopicRuleLoader;
 
         ///TopicRules key ist TopicVertex.TopicChain also die TopicPartsKette bis inkl diesem TopicPart
-        Dictionary<string, TopicVertex> TopicRules;
+        Dictionary<string, TopicVertex> TopicRulesAccess;
+        Dictionary<string, TopicVertex> TopicRulesDenyIn;
+        Dictionary<string, TopicVertex> TopicRulesDenyOut;
+
 
         int _sessionId = int.MinValue;
         public bool active { get; private set; } = false;
         public EnumMqttQualityOfService MqttQualityOfService = EnumMqttQualityOfService.QOS_LEVEL_AT_LEAST_ONCE;
 
 
-        public RuleEvaluationService(IMqttConnector mqttConnector, ILoadTopicRules TopicRuleLoader)
+        public RuleEvaluationDenyAccessDeny(IMqttConnector mqttConnector, ILoadTopicRules TopicRuleLoader)
         {
             this.mqttCon = mqttConnector;
             this.TopicRuleLoader = TopicRuleLoader;
@@ -38,8 +42,10 @@ namespace TopicTrennerAPI.Service
             string[] topicParts = topic.Trim().ToLower().Split("/");
 
             //TODO topic check wie im Bsp von GITHUB
-            if(topicParts[0] != null && TopicRules.TryGetValue(topicParts[0], out TopicVertex tv))
+            if(topicParts[0] != null && TopicRulesAccess.TryGetValue(topicParts[0], out TopicVertex tv))
             {
+                //TODO 01.07.2019 hier muss irgendwie TreeWalkDeny rein
+                //if(!TreeWalkDeny(message, topicParts, 0, ))
                 TreeWalk(message, topicParts, 0, tv);
             }
             
@@ -48,7 +54,7 @@ namespace TopicTrennerAPI.Service
 
         private void TreeWalk(byte[] message, string[] topicPartsMessageIn, int topicPartIndex, TopicVertex topicVertxRule)
         {
-            if(topicVertxRule.Rules.Count > 0)
+            if (topicVertxRule.Rules.Count > 0)
             {
                 CheckTheRule(message, topicPartsMessageIn, topicPartIndex, topicVertxRule);
             }
@@ -66,6 +72,65 @@ namespace TopicTrennerAPI.Service
                     }
                 }
             }
+        }
+
+        //return true by deny
+        private bool TreeWalkDeny(string[] topicPartsMessageIn, int topicPartIndex, TopicVertex topicVertxRule)
+        {
+            if (topicVertxRule.Rules.Count > 0)
+            {
+                return CheckTheRuleMatch(topicPartsMessageIn, topicPartIndex, topicVertxRule);
+            }
+
+            // checking for new TopicVertex
+            List<TopicVertex> tvList = topicVertxRule.GetChildVertexList();
+            if (tvList.Count > 0)
+            {
+                bool stopLoop = false;
+                topicPartIndex++;
+                foreach (TopicVertex tv in tvList)
+                {
+                    if (tv.TopicPart == topicPartsMessageIn[topicPartIndex] || tv.TopicPart == "#" || tv.TopicPart == "+")
+                    {
+                        stopLoop = TreeWalkDeny(topicPartsMessageIn, topicPartIndex, tv);
+                    }
+
+                    if(stopLoop)
+                    {
+                        //stop  weil ein TreeWalk zurück kommt aus dem Stack mit einem Match
+                        return true;
+                    }
+                }
+            }
+            // no DenyRule found
+            return false;
+        }
+
+        //prüft ob die Rule Matched
+        //return true by Match
+        private bool CheckTheRuleMatch(string[] topicPartsMessageIn, int topicPartIndex, TopicVertex topicVertxRule)
+        {
+            // wenn keine Rul da, dann gibt es nix zu tuen
+            if (topicVertxRule.Rules.Count == 0)
+            {
+                return false;
+            }
+
+            // wenn # dann feuer
+            if (topicVertxRule.TopicPart == "#")
+            {
+                return true;
+            }
+
+            // wenn der topicPart übereinstimmt und das der letzt Part ist dann feuer
+            if (topicPartsMessageIn.Count() == (topicPartIndex + 1)
+                && (topicPartsMessageIn[topicPartIndex] == topicVertxRule.TopicPart
+                    || topicPartsMessageIn[topicPartIndex] == "+"))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         //prüft ob die Rule ausgeführt werden kann
@@ -153,7 +218,9 @@ namespace TopicTrennerAPI.Service
 
         public void StartRuleSession(int sessionId)
         {
-            TopicRules = TopicRuleLoader.LoadRules(sessionId);
+            TopicRulesAccess = TopicRuleLoader.LoadRules(sessionId, EnumSimpleRuleTyp.access);
+            TopicRulesDenyIn = TopicRuleLoader.LoadRules(sessionId, EnumSimpleRuleTyp.denyIn);
+            TopicRulesDenyOut = TopicRuleLoader.LoadRules(sessionId, EnumSimpleRuleTyp.denyOut);
             _sessionId = sessionId;
             active = true;
         }
@@ -175,7 +242,9 @@ namespace TopicTrennerAPI.Service
             {
                 return false;
             }
-            TopicRules = TopicRuleLoader.LoadRules(sessionId);
+            TopicRulesAccess = TopicRuleLoader.LoadRules(sessionId, EnumSimpleRuleTyp.access);
+            TopicRulesDenyIn = TopicRuleLoader.LoadRules(sessionId, EnumSimpleRuleTyp.denyIn);
+            TopicRulesDenyOut = TopicRuleLoader.LoadRules(sessionId, EnumSimpleRuleTyp.denyOut);
             active = true;
             return true;
         }

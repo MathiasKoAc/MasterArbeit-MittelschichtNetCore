@@ -7,6 +7,6 @@ namespace TopicTrennerAPI.Models
 {
     public enum EnumSimpleRuleTyp
     {
-        access, deny
+        access, denyIn, denyOut
     }
 }

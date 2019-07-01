@@ -6,6 +6,6 @@ namespace TopicTrennerAPI.Interfaces
 {
     public interface ILoadTopicRules
     {
-        Dictionary<string, TopicVertex> LoadRules(int sessionId);
+        Dictionary<string, TopicVertex> LoadRules(int sessionId, EnumSimpleRuleTyp ruleTyp = EnumSimpleRuleTyp.access);
     }
 }
