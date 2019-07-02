@@ -41,12 +41,16 @@ namespace TopicTrennerAPI.Service
 
             string[] topicParts = topic.Trim().ToLower().Split("/");
 
-            //TODO topic check wie im Bsp von GITHUB
-            if(topicParts[0] != null && TopicRulesAccess.TryGetValue(topicParts[0], out TopicVertex tv))
+            if (CheckDeny(topicParts, TopicRulesDenyIn))
             {
-                //TODO 01.07.2019 hier muss irgendwie TreeWalkDeny rein
-                //if(!TreeWalkDeny(message, topicParts, 0, ))
-                TreeWalk(message, topicParts, 0, tv);
+                //Topic Denyed by DenyIn-Rule
+                return;
+            }
+
+            //TODO topic check wie im Bsp von GITHUB
+            if (topicParts[0] != null && TopicRulesAccess.TryGetValue(topicParts[0], out TopicVertex tv_access))
+            {
+                TreeWalk(message, topicParts, 0, tv_access);
             }
             
             //if there is no topic to match... do nothing
@@ -56,7 +60,7 @@ namespace TopicTrennerAPI.Service
         {
             if (topicVertxRule.Rules.Count > 0)
             {
-                CheckTheRule(message, topicPartsMessageIn, topicPartIndex, topicVertxRule);
+                CheckTheRuleAndSend(message, topicPartsMessageIn, topicPartIndex, topicVertxRule);
             }
 
             // checking for new TopicVertex
@@ -134,7 +138,7 @@ namespace TopicTrennerAPI.Service
         }
 
         //prüft ob die Rule ausgeführt werden kann
-        private void CheckTheRule(byte[] message, string[] topicPartsMessageIn, int topicPartIndex, TopicVertex topicVertxRule)
+        private void CheckTheRuleAndSend(byte[] message, string[] topicPartsMessageIn, int topicPartIndex, TopicVertex topicVertxRule)
         {
             // wenn keine Rul da, dann gibt es nix zu tuen
             if(topicVertxRule.Rules.Count == 0)
@@ -161,18 +165,37 @@ namespace TopicTrennerAPI.Service
         {
             foreach(Rule r in Rules)
             {
-                if(!r.OutTopicHasWildcard)
+                if(!r.OutTopicHasWildcard && !CheckDeny(r.OutTopic, TopicRulesDenyOut)) //wenn keine Wildcard drin und topicOut erlaubt
                 {
                     // normal senden
                     this.mqttCon.PublishMessage(r.OutTopic, message, (byte) this.MqttQualityOfService);
-                } else
+                }
+                else if (TryBuildTopicOutByWildcardRule(topicPartsMessageIn, r, out string topicOut) && !CheckDeny(topicOut, TopicRulesDenyOut))
                 {
-                    SendMessageWithWildcardByRule(message, topicPartsMessageIn, r);
+                    //senden, wenn Topic gebuilded werden konnte und topicOut erlaubt
+                    this.mqttCon.PublishMessage(topicOut, message, (byte)this.MqttQualityOfService);
                 }
             }
         }
 
-        private void SendMessageWithWildcardByRule(byte[] message, string[] topicPartsMessageIn, Rule r)
+        //deny = true
+        private bool CheckDeny(string[] topicParts, Dictionary<string, TopicVertex> topicRulesDeny)
+        {
+            if (topicRulesDeny.TryGetValue(topicParts[0], out TopicVertex tv_denyIn) && TreeWalkDeny(topicParts, 0, tv_denyIn))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private bool CheckDeny(string topicFull, Dictionary<string, TopicVertex> topicRulesDeny)
+        {
+            string[] topicParts = topicFull.Trim().ToLower().Split("/");
+            return CheckDeny(topicParts, topicRulesDeny);
+        }
+
+        //return true if Message can build
+        private bool TryBuildTopicOutByWildcardRule(string[] topicPartsMessageIn, Rule r, out string topicOut)
         {
             // OutTopic zusammenbauen / Wildcard ersetzen
             string[] topicPartsRegel = r.GetOutTopicParts();
@@ -212,8 +235,11 @@ namespace TopicTrennerAPI.Service
                         topicBuild.Append(topicPartsMessageIn[i]);
                     }
                 }
-                mqttCon.PublishMessage(topicBuild.ToString(), message, (byte)MqttQualityOfService);
+                topicOut = topicBuild.ToString();
+                return true;
             }
+            topicOut = "";
+            return false;
         }
 
         public void StartRuleSession(int sessionId)

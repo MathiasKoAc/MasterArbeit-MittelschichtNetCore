@@ -28,7 +28,7 @@ namespace TopicTrennerAPI
             services.AddScoped<IMqttConnector, MqttConnectorService>();
             services.AddScoped<ILoadTopicRules, DbRuleLoader>();
             services.AddScoped<ICreateTopicRulesFromSimpleRules, TopicRuleFactory>();
-            services.AddScoped<IControlRules, RuleEvaluationService>();
+            services.AddScoped<IControlRules, RuleEvaluationDenyAccessDeny>();
 
         }
 
