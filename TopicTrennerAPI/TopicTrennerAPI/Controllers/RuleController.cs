@@ -51,6 +51,9 @@ namespace TopicTrennerAPI.Controllers
         [HttpPost]
         public void Post(SimpleRule sRule)
         {
+            sRule.InTopic = sRule.InTopic.ToLower();
+            sRule.OutTopic = sRule.OutTopic.ToLower();
+
             _context.Rules.Add(sRule);
             _context.SaveChanges();
 
@@ -69,6 +72,9 @@ namespace TopicTrennerAPI.Controllers
             {
                 return BadRequest();
             }
+
+            sRule.InTopic = sRule.InTopic.ToLower();
+            sRule.OutTopic = sRule.OutTopic.ToLower();
 
             _context.Entry(sRule).State = EntityState.Modified;
             _context.SaveChanges();

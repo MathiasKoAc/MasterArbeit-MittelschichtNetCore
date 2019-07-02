@@ -63,7 +63,7 @@ namespace TopicTrennerAPI.Controllers
 
         // PUT: api/SessionRun/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, SessionRun sessionR)
+        public IActionResult Put(int id, SessionRun sessionR)
         {
             if (id != sessionR.ID)
             {
@@ -78,17 +78,16 @@ namespace TopicTrennerAPI.Controllers
 
             var oldSessionR = _context.SessionRuns.Find(id);
 
-            if (sessionR.Active && !oldSessionR.Active)
+            if (sessionR.Active)
             {
                 SetAllInactiveActive();
-            }
-            _context.SaveChanges();
-
-            if(sessionR.Active && !oldSessionR.Active)
-            {
                 _ctrlRuleSession.StartRuleSession(sessionR.SessionID);
             }
-            _context.SessionRuns.Update(oldSessionR);
+            else if(!sessionR.Active)
+            {
+                _ctrlRuleSession.StopRuleSession(sessionR.SessionID);
+            }
+
             oldSessionR.Active = sessionR.Active;
             if(sessionR.StopTime != null)
             {
@@ -125,24 +124,16 @@ namespace TopicTrennerAPI.Controllers
         private void SetAllInactiveActive()
         {
             var runs = _context.SessionRuns.Where(sr => sr.Active == true);
-            bool modified = false;
             foreach (SessionRun r in runs)
             {
-                if(r != null)
-                {
-                    modified = true;
-                }
                 r.Active = false;
-                if(r.StopTime == null)
+                _ctrlRuleSession.StopRuleSession(r.SessionID);
+                if (r.StopTime == null)
                 {
                     r.StopTime = DateTime.Now;
                 }
             }
-
-            if(modified)
-            {
-                _context.SaveChanges();
-            }
+            _context.SaveChanges();
         }
     }
 }

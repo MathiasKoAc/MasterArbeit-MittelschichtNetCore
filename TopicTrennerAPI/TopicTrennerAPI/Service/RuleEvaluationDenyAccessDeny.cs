@@ -22,7 +22,7 @@ namespace TopicTrennerAPI.Service
 
 
         int _sessionId = int.MinValue;
-        public bool active { get; private set; } = false;
+        public static volatile bool active = false;
         public EnumMqttQualityOfService MqttQualityOfService = EnumMqttQualityOfService.QOS_LEVEL_AT_LEAST_ONCE;
 
 
@@ -73,7 +73,7 @@ namespace TopicTrennerAPI.Service
                 topicPartIndex++;
                 foreach (TopicVertex tv in tvList)
                 {
-                    if(tv.TopicPart.Equals(topicPartsMessageIn[topicPartIndex]) || tv.TopicPart.Equals("#") || tv.TopicPart.Equals("+"))
+                    if(tv.TopicPart.Equals(topicPartsMessageIn[topicPartIndex], StringComparison.InvariantCultureIgnoreCase) || tv.TopicPart.Equals("#", StringComparison.InvariantCultureIgnoreCase) || tv.TopicPart.Equals("+", StringComparison.InvariantCultureIgnoreCase))
                     {
                         TreeWalk(message, topicPartsMessageIn, topicPartIndex, tv);
                     }
@@ -97,7 +97,7 @@ namespace TopicTrennerAPI.Service
                 topicPartIndex++;
                 foreach (TopicVertex tv in tvList)
                 {
-                    if (tv.TopicPart.Equals(topicPartsMessageIn[topicPartIndex]) || tv.TopicPart.Equals("#") || tv.TopicPart.Equals("+"))
+                    if (tv.TopicPart.Equals(topicPartsMessageIn[topicPartIndex], StringComparison.InvariantCultureIgnoreCase) || tv.TopicPart.Equals("#", StringComparison.InvariantCultureIgnoreCase) || tv.TopicPart.Equals("+", StringComparison.InvariantCultureIgnoreCase))
                     {
                         stopLoop = TreeWalkDeny(topicPartsMessageIn, topicPartIndex, tv);
                     }
@@ -215,6 +215,7 @@ namespace TopicTrennerAPI.Service
                     if (topicPartsRegel[i].Equals("+"))
                     {
                         // + ersetzten mit Value von topic der Message
+                        topicBuild.Append("/");
                         topicBuild.Append(topicPartsMessageIn[i]);
                     }
                     else if (topicPartsRegel[i].Equals("#"))
@@ -226,6 +227,7 @@ namespace TopicTrennerAPI.Service
                     else
                     {
                         // weiter anhängen...
+                        topicBuild.Append("/");
                         topicBuild.Append(topicPartsRegel[i]);
                     }
                 }
@@ -235,6 +237,7 @@ namespace TopicTrennerAPI.Service
                 {
                     for(;i < topicPartsMessageIn.Count(); i++) {
                         // TODO go over the MessageParts and replace the #
+                        topicBuild.Append("/");
                         topicBuild.Append(topicPartsMessageIn[i]);
                     }
                 }
