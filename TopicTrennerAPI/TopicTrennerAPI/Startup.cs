@@ -25,7 +25,7 @@ namespace TopicTrennerAPI
             services.AddDbContext<DbTopicTrennerContext>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddScoped<IServerConfig, ServerConfigDummycs>();
-            services.AddScoped<IMqttConnector, MqttConnectorService>();
+            services.AddScoped<IMqttConnector, MqttConnectAll>();
             services.AddScoped<ILoadTopicRules, DbRuleLoader>();
             services.AddScoped<ICreateTopicRulesFromSimpleRules, TopicRuleFactory>();
             services.AddScoped<IControlRules, RuleEvaluationDenyAccessDeny>();

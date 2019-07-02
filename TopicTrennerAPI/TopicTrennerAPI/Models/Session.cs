@@ -14,11 +14,14 @@ namespace TopicTrennerAPI.Models
 
         public bool IsActive()
         {
-            foreach(SessionRun sr in SessionRuns)
+            if(SessionRuns != null)
             {
-                if(sr.Active)
+                foreach (SessionRun sr in SessionRuns)
                 {
-                    return true;
+                    if (sr.Active)
+                    {
+                        return true;
+                    }
                 }
             }
             return false;

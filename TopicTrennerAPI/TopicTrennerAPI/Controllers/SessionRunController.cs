@@ -82,13 +82,19 @@ namespace TopicTrennerAPI.Controllers
             {
                 SetAllInactiveActive();
             }
-            _context.Entry(sessionR).State = EntityState.Modified;
             _context.SaveChanges();
 
             if(sessionR.Active && !oldSessionR.Active)
             {
                 _ctrlRuleSession.StartRuleSession(sessionR.SessionID);
             }
+            _context.SessionRuns.Update(oldSessionR);
+            oldSessionR.Active = sessionR.Active;
+            if(sessionR.StopTime != null)
+            {
+                oldSessionR.StopTime = sessionR.StopTime;
+            }
+            _context.SaveChanges();
             return NoContent();
         }
 
@@ -119,15 +125,24 @@ namespace TopicTrennerAPI.Controllers
         private void SetAllInactiveActive()
         {
             var runs = _context.SessionRuns.Where(sr => sr.Active == true);
-            foreach(SessionRun r in runs)
+            bool modified = false;
+            foreach (SessionRun r in runs)
             {
+                if(r != null)
+                {
+                    modified = true;
+                }
                 r.Active = false;
                 if(r.StopTime == null)
                 {
                     r.StopTime = DateTime.Now;
                 }
             }
-            _context.Entry(runs).State = EntityState.Modified;
+
+            if(modified)
+            {
+                _context.SaveChanges();
+            }
         }
     }
 }

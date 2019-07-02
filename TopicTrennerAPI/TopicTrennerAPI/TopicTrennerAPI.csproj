@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <Platforms>AnyCPU;x64</Platforms>
+    <Configurations>Debug;Release;x64 run</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

@@ -54,8 +54,8 @@ namespace TopicTrennerAPI.Controllers
             _context.Rules.Add(sRule);
             _context.SaveChanges();
 
-            Session ses = _context.Sessions.Where(s => s.ID == sRule.SessionID).First();
-            if(ses.IsActive())
+            Session ses = _context.Sessions.Include(s => s.SessionRuns).Where(s => s.ID == sRule.SessionID).First();
+            if(ses != null && ses.IsActive())
             {
                 _ctrlRuleSession.ReloadRules(ses.ID);
             }

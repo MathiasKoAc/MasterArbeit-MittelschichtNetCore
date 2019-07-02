@@ -24,6 +24,11 @@ namespace TopicTrennerAPI.Service
             return topicRules;
         }
 
+        public Dictionary<string, TopicVertex> LoadRules(int sessionId, EnumSimpleRuleTyp ruleTyp = EnumSimpleRuleTyp.access)
+        {
+            throw new NotImplementedException();
+        }
+
         // Deserialize a JSON stream to a List<SimpleRule> object.  
         private List<SimpleRule> ReadToSimpleRuleList(string json)
         {

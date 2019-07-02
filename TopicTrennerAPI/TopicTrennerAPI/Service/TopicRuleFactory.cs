@@ -32,6 +32,7 @@ namespace TopicTrennerAPI.Service
                         topicRules.Add(aktualVertex.TopicChain, aktualVertex);
                     }
                     strBuilder.Append("/");
+                    lastVertex = aktualVertex;
                 }
                 aktualVertex.Rules.Add(new Rule(aktualVertex, simpleRule));
             }

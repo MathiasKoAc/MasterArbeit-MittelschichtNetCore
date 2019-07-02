@@ -30,6 +30,9 @@ namespace TopicTrennerAPI.Service
         {
             this.mqttCon = mqttConnector;
             this.TopicRuleLoader = TopicRuleLoader;
+
+            //TODO checken ob nicht zu häftig:
+            this.mqttCon.AddTopicReceiver("#", this, EnumMqttQualityOfService.QOS_LEVEL_EXACTLY_ONCE);
         }
 
         public void OnReceivedMessage(string topic, byte[] message)

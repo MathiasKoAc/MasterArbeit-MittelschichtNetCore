@@ -10,17 +10,37 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
 		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		x64 run|Any CPU = x64 run|Any CPU
+		x64 run|x64 = x64 run|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{8B9F80D1-D479-4C93-9171-C8D6A0A903B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8B9F80D1-D479-4C93-9171-C8D6A0A903B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B9F80D1-D479-4C93-9171-C8D6A0A903B1}.Debug|x64.ActiveCfg = Debug|x64
+		{8B9F80D1-D479-4C93-9171-C8D6A0A903B1}.Debug|x64.Build.0 = Debug|x64
 		{8B9F80D1-D479-4C93-9171-C8D6A0A903B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B9F80D1-D479-4C93-9171-C8D6A0A903B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B9F80D1-D479-4C93-9171-C8D6A0A903B1}.Release|x64.ActiveCfg = Release|x64
+		{8B9F80D1-D479-4C93-9171-C8D6A0A903B1}.Release|x64.Build.0 = Release|x64
+		{8B9F80D1-D479-4C93-9171-C8D6A0A903B1}.x64 run|Any CPU.ActiveCfg = x64 run|x64
+		{8B9F80D1-D479-4C93-9171-C8D6A0A903B1}.x64 run|Any CPU.Build.0 = x64 run|x64
+		{8B9F80D1-D479-4C93-9171-C8D6A0A903B1}.x64 run|x64.ActiveCfg = x64 run|x64
+		{8B9F80D1-D479-4C93-9171-C8D6A0A903B1}.x64 run|x64.Build.0 = x64 run|x64
 		{DA81234C-AE10-4029-B43A-DAF2E4AD2C83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DA81234C-AE10-4029-B43A-DAF2E4AD2C83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA81234C-AE10-4029-B43A-DAF2E4AD2C83}.Debug|x64.ActiveCfg = Debug|x64
+		{DA81234C-AE10-4029-B43A-DAF2E4AD2C83}.Debug|x64.Build.0 = Debug|x64
 		{DA81234C-AE10-4029-B43A-DAF2E4AD2C83}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA81234C-AE10-4029-B43A-DAF2E4AD2C83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA81234C-AE10-4029-B43A-DAF2E4AD2C83}.Release|x64.ActiveCfg = Release|x64
+		{DA81234C-AE10-4029-B43A-DAF2E4AD2C83}.Release|x64.Build.0 = Release|x64
+		{DA81234C-AE10-4029-B43A-DAF2E4AD2C83}.x64 run|Any CPU.ActiveCfg = x64 run|x64
+		{DA81234C-AE10-4029-B43A-DAF2E4AD2C83}.x64 run|Any CPU.Build.0 = x64 run|x64
+		{DA81234C-AE10-4029-B43A-DAF2E4AD2C83}.x64 run|x64.ActiveCfg = x64 run|x64
+		{DA81234C-AE10-4029-B43A-DAF2E4AD2C83}.x64 run|x64.Build.0 = x64 run|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
