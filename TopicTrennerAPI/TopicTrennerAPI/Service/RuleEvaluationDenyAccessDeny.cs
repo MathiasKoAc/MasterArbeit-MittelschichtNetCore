@@ -73,7 +73,7 @@ namespace TopicTrennerAPI.Service
                 topicPartIndex++;
                 foreach (TopicVertex tv in tvList)
                 {
-                    if(tv.TopicPart == topicPartsMessageIn[topicPartIndex] || tv.TopicPart == "#" || tv.TopicPart == "+")
+                    if(tv.TopicPart.Equals(topicPartsMessageIn[topicPartIndex]) || tv.TopicPart.Equals("#") || tv.TopicPart.Equals("+"))
                     {
                         TreeWalk(message, topicPartsMessageIn, topicPartIndex, tv);
                     }
@@ -97,7 +97,7 @@ namespace TopicTrennerAPI.Service
                 topicPartIndex++;
                 foreach (TopicVertex tv in tvList)
                 {
-                    if (tv.TopicPart == topicPartsMessageIn[topicPartIndex] || tv.TopicPart == "#" || tv.TopicPart == "+")
+                    if (tv.TopicPart.Equals(topicPartsMessageIn[topicPartIndex]) || tv.TopicPart.Equals("#") || tv.TopicPart.Equals("+"))
                     {
                         stopLoop = TreeWalkDeny(topicPartsMessageIn, topicPartIndex, tv);
                     }
