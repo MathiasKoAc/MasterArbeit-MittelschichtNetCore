@@ -9,6 +9,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace TopicTrennerAPI.Service
 {
+
+    //--- WICHTIG---// 
+    // in der Masterarbeit NICHT IN VERWENDUNG
+    // siehe RuleEvaluationDenyAssessDeny
     public class RuleEvaluationService : IMqttTopicReceiver, IControlRules
     {
         IMqttConnector mqttCon;

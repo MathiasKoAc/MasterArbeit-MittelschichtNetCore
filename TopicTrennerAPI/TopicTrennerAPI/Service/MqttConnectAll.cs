@@ -11,23 +11,48 @@ namespace TopicTrennerAPI.Service
 {
     public class MqttConnectAll : IMqttConnector
     {
-        private volatile bool isActive = true;
+        private static volatile IMqttConnector _instance = null;
+        private volatile bool isActive = true; //static
 
-        private IServerConfig _serverConfig;
+        public static IServerConfig ServerConfig;
         private MqttClient client;
         private List<IMqttTopicReceiver> ListTopicReceiver;
 
         private BlockingCollection<MqttMsgPublishEventArgs> receiverQueue;
         private BlockingCollection<MqttMsgPublishEventArgs> senderQueue;
 
-        public MqttConnectAll(IServerConfig serverConfig)
+        public static IMqttConnector GetInstance(IServerConfig serverConfig)
+        {
+            lock (_instance)
+            {
+                if (_instance == null)
+                {
+                    _instance = new MqttConnectAll(serverConfig);
+                }
+                return _instance;
+            }
+        }
+
+        public static IMqttConnector GetInstance()
+        {
+            lock (_instance)
+            {
+                if (_instance == null && ServerConfig == null)
+                {
+                    throw new Exception("Wrong config Exception, please setup the ServerConfig Attribute");
+                }
+                return GetInstance(ServerConfig);
+            }
+        }
+
+        private MqttConnectAll(IServerConfig serverConfig)
         {
             Start(serverConfig);
         }
 
         public void Start(IServerConfig serverConfig)
         {
-            _serverConfig = serverConfig;
+            ServerConfig = serverConfig;
             this.Start();
         }
 
@@ -41,13 +66,13 @@ namespace TopicTrennerAPI.Service
             {
                 isActive = true;
                 // create client instance 
-                client = new MqttClient(_serverConfig.GetServerIp());
+                client = new MqttClient(ServerConfig.GetServerIp());
 
                 // register to message received 
                 client.MqttMsgPublishReceived += Client_MqttMsgPublishReceived;
 
                 string clientId = Guid.NewGuid().ToString();
-                byte conacct = client.Connect(clientId, _serverConfig.GetUsername(), _serverConfig.GetPassword());
+                byte conacct = client.Connect(clientId, ServerConfig.GetUsername(), ServerConfig.GetPassword());
 
                 if (conacct != MqttMsgConnack.CONN_ACCEPTED)
                 {
@@ -59,7 +84,7 @@ namespace TopicTrennerAPI.Service
             catch (Exception)
             {
                 this.StopInnerCoroutines();
-                string errorstr = new StringBuilder("ERROR: MqttConnector can't Connect to the Broker on IP: ").Append(_serverConfig.GetServerIp()).ToString();
+                string errorstr = new StringBuilder("ERROR: MqttConnector can't Connect to the Broker on IP: ").Append(ServerConfig.GetServerIp()).ToString();
                 Console.WriteLine(errorstr);
                 throw new Exception(errorstr);
             }
