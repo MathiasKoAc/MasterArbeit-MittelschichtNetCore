@@ -4,13 +4,13 @@ using Microsoft.Extensions.Configuration;
 
 namespace TopicTrennerAPI.Service
 {
-    public class ServerConfigDummycs : IServerConfig
+    public class ServerConfigConnectionString : IServerConfig
     {
         private readonly string _password;
         private readonly string _ip;
         private readonly string _username;
 
-        public ServerConfigDummycs (IConfiguration config) {
+        public ServerConfigConnectionString (IConfiguration config) {
             _password = config.GetConnectionString("MqttDefaulConnectionPasswort");
             _ip = config.GetConnectionString("MqttDefaulConnectionServer");
             _username = config.GetConnectionString("MqttDefaulConnectionUser");
