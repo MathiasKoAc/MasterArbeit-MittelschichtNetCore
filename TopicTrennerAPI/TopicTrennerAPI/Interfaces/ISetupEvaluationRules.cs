@@ -6,7 +6,7 @@ using TopicTrennerAPI.Models;
 
 namespace TopicTrennerAPI.Interfaces
 {
-    public interface ISetupEvaluationRules
+    public interface IRuleEvaluation
     {
         void SetTopicRulesAccess(Dictionary<string, TopicVertex> accessRules);
         void SetTopicRulesDenyIn(Dictionary<string, TopicVertex> denyInRules);

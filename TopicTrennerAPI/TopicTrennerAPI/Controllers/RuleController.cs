@@ -16,8 +16,8 @@ namespace TopicTrennerAPI.Controllers
     {
         //Controller for Model typ SimpleRule
 
-        DbTopicTrennerContext _context;
-        IControlRuleSessions _ctrlRuleSession;
+        readonly DbTopicTrennerContext _context;
+        readonly IControlRuleSessions _ctrlRuleSession;
 
         public RuleController(DbTopicTrennerContext context, IControlRuleSessions ctrlRuleSession)
         {
@@ -51,8 +51,8 @@ namespace TopicTrennerAPI.Controllers
         [HttpPost]
         public void Post(SimpleRule sRule)
         {
-            sRule.InTopic = sRule.InTopic.ToLower();
-            sRule.OutTopic = sRule.OutTopic.ToLower();
+            sRule.InTopic = sRule.InTopic != null ? sRule.InTopic.ToLower() : null;
+            sRule.OutTopic = sRule.OutTopic != null ? sRule.OutTopic.ToLower() : null;
 
             _context.Rules.Add(sRule);
             _context.SaveChanges();
@@ -73,13 +73,13 @@ namespace TopicTrennerAPI.Controllers
                 return BadRequest();
             }
 
-            sRule.InTopic = sRule.InTopic.ToLower();
-            sRule.OutTopic = sRule.OutTopic.ToLower();
+            sRule.InTopic = sRule.InTopic != null ? sRule.InTopic.ToLower() : null;
+            sRule.OutTopic = sRule.OutTopic != null ? sRule.OutTopic.ToLower() : null;
 
             _context.Entry(sRule).State = EntityState.Modified;
             _context.SaveChanges();
 
-            Session ses = _context.Sessions.Where(s => s.ID == sRule.SessionID).First();
+            Session ses = _context.Sessions.Include(s => s.SessionRuns).Where(s => s.ID == sRule.SessionID).First();
             if (ses.IsActive())
             {
                 _ctrlRuleSession.ReloadRules(ses.ID);

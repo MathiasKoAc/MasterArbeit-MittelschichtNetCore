@@ -8,7 +8,7 @@ using TopicTrennerAPI.Interfaces;
 namespace TopicTrennerAPI.Service
 {
     //alternativ Implementierung von RuleEvaluationService um DenyAccessDeny zu ermöglichen
-    public class RuleEvaluationDenyAccessDeny : IMqttTopicReceiver, ISetupEvaluationRules
+    public class RuleEvaluationDenyAccessDeny : IMqttTopicReceiver, IRuleEvaluation
     {
         readonly IMqttConnector mqttCon;
 

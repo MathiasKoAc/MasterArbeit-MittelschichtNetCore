@@ -11,7 +11,7 @@ namespace TopicTrennerAPI.Controllers
     [ApiController]
     public class MqttController : ControllerBase
     {
-        private IMqttConnector _mqttConnector;
+        readonly IMqttConnector _mqttConnector;
 
         public MqttController(IMqttConnector mqttConnector)
         {

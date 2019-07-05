@@ -9,6 +9,5 @@ namespace TopicTrennerAPI.Interfaces
         void PublishMessage(string topic, byte[] Message, byte MqttQOS_Level, bool retain = false);
         void AddTopicReceiver(string topic, IMqttTopicReceiver receiver, EnumMqttQualityOfService MqttQOS_Level = EnumMqttQualityOfService.QOS_LEVEL_EXACTLY_ONCE);
         void AddTopicReceiver(string topic, IMqttTopicReceiver receiver, byte MqttQOS_Level);
-        string Hello();
     }
 }

@@ -5,11 +5,11 @@ namespace TopicTrennerAPI.Service
 {
     public class RuleSessionManager : IControlRuleSessions
     {
-        ILoadTopicRules TopicRuleLoader;
-        ISetupEvaluationRules RuleEvaluation;
+        readonly ILoadTopicRules TopicRuleLoader;
+        readonly IRuleEvaluation RuleEvaluation;
         int _sessionId = int.MinValue;
 
-        public RuleSessionManager(ILoadTopicRules topicRuleLoader, ISetupEvaluationRules setupEvaluationRules)
+        public RuleSessionManager(ILoadTopicRules topicRuleLoader, IRuleEvaluation setupEvaluationRules)
         {
             TopicRuleLoader = topicRuleLoader;
             RuleEvaluation = setupEvaluationRules;
