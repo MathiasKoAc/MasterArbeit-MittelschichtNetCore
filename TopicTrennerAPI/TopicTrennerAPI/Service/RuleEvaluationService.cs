@@ -13,7 +13,7 @@ namespace TopicTrennerAPI.Service
     //--- WICHTIG---// 
     // in der Masterarbeit NICHT IN VERWENDUNG
     // siehe RuleEvaluationDenyAssessDeny
-    public class RuleEvaluationService : IMqttTopicReceiver, IControlRules
+    public class RuleEvaluationService : IMqttTopicReceiver, IControlRuleSessions
     {
         IMqttConnector mqttCon;
         ILoadTopicRules TopicRuleLoader;

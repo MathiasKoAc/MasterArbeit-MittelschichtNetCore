@@ -2,18 +2,15 @@
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-
 using TopicTrennerAPI.Models;
 using TopicTrennerAPI.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace TopicTrennerAPI.Service
 {
     //alternativ Implementierung von RuleEvaluationService um DenyAccessDeny zu ermöglichen
-    public class RuleEvaluationDenyAccessDeny : IMqttTopicReceiver, IControlRules
+    public class RuleEvaluationDenyAccessDeny : IMqttTopicReceiver, ISetupEvaluationRules
     {
-        IMqttConnector mqttCon;
-        ILoadTopicRules TopicRuleLoader;
+        readonly IMqttConnector mqttCon;
 
         ///TopicRules key ist TopicVertex.TopicChain also die TopicPartsKette bis inkl diesem TopicPart
         Dictionary<string, TopicVertex> TopicRulesAccess;
@@ -21,15 +18,15 @@ namespace TopicTrennerAPI.Service
         Dictionary<string, TopicVertex> TopicRulesDenyOut;
 
 
-        int _sessionId = int.MinValue;
-        public static volatile bool active = false;
         public EnumMqttQualityOfService MqttQualityOfService = EnumMqttQualityOfService.QOS_LEVEL_AT_LEAST_ONCE;
 
+        private object _locker = new object();
+        private volatile bool _active;
 
-        public RuleEvaluationDenyAccessDeny(IMqttConnector mqttConnector, ILoadTopicRules TopicRuleLoader)
+
+        public RuleEvaluationDenyAccessDeny(IMqttConnector mqttConnector)
         {
             this.mqttCon = mqttConnector;
-            this.TopicRuleLoader = TopicRuleLoader;
 
             //TODO checken ob nicht zu häftig:
             this.mqttCon.AddTopicReceiver("#", this, EnumMqttQualityOfService.QOS_LEVEL_EXACTLY_ONCE);
@@ -37,7 +34,7 @@ namespace TopicTrennerAPI.Service
 
         public void OnReceivedMessage(string topic, byte[] message)
         {
-            if(!active)
+            if(!_active)
             {
                 return;
             }
@@ -248,42 +245,32 @@ namespace TopicTrennerAPI.Service
             return false;
         }
 
-        public void StartRuleSession(int sessionId)
+        public void SetTopicRulesAccess(Dictionary<string, TopicVertex> accessRules)
         {
-            TopicRulesAccess = TopicRuleLoader.LoadRules(sessionId, EnumSimpleRuleTyp.access);
-            TopicRulesDenyIn = TopicRuleLoader.LoadRules(sessionId, EnumSimpleRuleTyp.denyIn);
-            TopicRulesDenyOut = TopicRuleLoader.LoadRules(sessionId, EnumSimpleRuleTyp.denyOut);
-            _sessionId = sessionId;
-            active = true;
+            TopicRulesAccess = accessRules;
         }
 
-        public bool StopRuleSession(int sessionId)
+        public void SetTopicRulesDenyIn(Dictionary<string, TopicVertex> denyInRules)
         {
-            if(_sessionId != int.MinValue && _sessionId != sessionId)
+            TopicRulesDenyIn = denyInRules;
+        }
+
+        public void SetTopicRulesDenyOut(Dictionary<string, TopicVertex> denyOutRules)
+        {
+            TopicRulesDenyOut = denyOutRules;
+        }
+
+        public bool IsRuleEvaluationActive()
+        {
+            return _active;
+        }
+
+        public void SetRuleEvaluationActive(bool active)
+        {
+            lock (_locker)
             {
-                return false;
+                _active = active;
             }
-            active = false;
-            _sessionId = int.MinValue;
-            return true;
-        }
-
-        public bool ReloadRules(int sessionId)
-        {
-            if (_sessionId != int.MinValue && _sessionId != sessionId)
-            {
-                return false;
-            }
-            TopicRulesAccess = TopicRuleLoader.LoadRules(sessionId, EnumSimpleRuleTyp.access);
-            TopicRulesDenyIn = TopicRuleLoader.LoadRules(sessionId, EnumSimpleRuleTyp.denyIn);
-            TopicRulesDenyOut = TopicRuleLoader.LoadRules(sessionId, EnumSimpleRuleTyp.denyOut);
-            active = true;
-            return true;
-        }
-
-        public int GetSessionId()
-        {
-            return _sessionId;
         }
     }
 }

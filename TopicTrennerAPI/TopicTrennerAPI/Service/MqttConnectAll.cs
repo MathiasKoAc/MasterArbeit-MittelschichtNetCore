@@ -11,7 +11,7 @@ namespace TopicTrennerAPI.Service
 {
     public class MqttConnectAll : IMqttConnector
     {
-        private static volatile IMqttConnector _instance = null;
+        //private static volatile IMqttConnector _instance = null;
         private volatile bool isActive = true; //static
 
         public static IServerConfig ServerConfig;
@@ -20,7 +20,7 @@ namespace TopicTrennerAPI.Service
 
         private BlockingCollection<MqttMsgPublishEventArgs> receiverQueue;
         private BlockingCollection<MqttMsgPublishEventArgs> senderQueue;
-
+        /*
         public static IMqttConnector GetInstance(IServerConfig serverConfig)
         {
             lock (_instance)
@@ -44,8 +44,8 @@ namespace TopicTrennerAPI.Service
                 return GetInstance(ServerConfig);
             }
         }
-
-        private MqttConnectAll(IServerConfig serverConfig)
+        */
+        public MqttConnectAll(IServerConfig serverConfig)
         {
             Start(serverConfig);
         }

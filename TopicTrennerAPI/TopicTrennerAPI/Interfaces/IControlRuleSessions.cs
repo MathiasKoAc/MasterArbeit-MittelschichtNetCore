@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace TopicTrennerAPI.Interfaces
 {
-    public interface IControlRules
+    public interface IControlRuleSessions
     {
         /// <summary>
         ///     Starts the Rule-Session with the id of session
