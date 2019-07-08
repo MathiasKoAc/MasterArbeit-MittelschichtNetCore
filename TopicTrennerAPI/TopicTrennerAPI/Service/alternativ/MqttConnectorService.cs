@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,19 +8,46 @@ using uPLibrary.Networking.M2Mqtt.Messages;
 
 namespace TopicTrennerAPI.Service
 {
-    public class MqttConnectAll : IMqttConnector
+    //--- WICHTIG---// 
+    // in der Masterarbeit NICHT IN VERWENDUNG
+    // siehe MqttConnectAll
+    public class MqttConnectorService : IMqttConnector
     {
-        //private static volatile IMqttConnector _instance = null;
-        private volatile bool isActive = true; //static
+        private volatile static IMqttConnector _instance = null;
+        private volatile bool isActive = true;
 
         public static IServerConfig ServerConfig;
         private MqttClient client;
-        private List<IMqttTopicReceiver> ListTopicReceiver;
+        private Dictionary<string, List<IMqttTopicReceiver>> DictTopicReceiver;
 
-        private BlockingCollection<MqttMsgPublishEventArgs> receiverQueue;
-        private BlockingCollection<MqttMsgPublishEventArgs> senderQueue;
+        private Queue<MqttMsgPublishEventArgs> receiverQueue;
+        private Queue<MqttMsgPublishEventArgs> senderQueue;
 
-        public MqttConnectAll(IServerConfig serverConfig)
+        public static IMqttConnector GetInstance(IServerConfig serverConfig)
+        {
+            lock (_instance)
+            {
+                if (_instance == null)
+                {
+                    _instance = new MqttConnectorService(serverConfig);
+                }
+                return _instance;
+            }
+        }
+
+        public static IMqttConnector GetInstance()
+        {
+            lock(_instance)
+            {
+                if(_instance == null && ServerConfig == null)
+                {
+                    throw new Exception("Wrong config Exception, please setup the ServerConfig Attribute");
+                }
+                return GetInstance(ServerConfig);
+            }
+        }
+
+        public MqttConnectorService(IServerConfig serverConfig)
         {
             Start(serverConfig);
         }
@@ -34,7 +60,7 @@ namespace TopicTrennerAPI.Service
 
         public void Start()
         {
-            ListTopicReceiver = new List<IMqttTopicReceiver>();
+            DictTopicReceiver = new Dictionary<string, List<IMqttTopicReceiver>>();
 
             InitAndStartInnerCoroutines();
 
@@ -74,7 +100,7 @@ namespace TopicTrennerAPI.Service
         void Client_MqttMsgPublishReceived(object sender, MqttMsgPublishEventArgs e)
         {
             Console.WriteLine(new StringBuilder("Received: ").Append(System.Text.Encoding.UTF8.GetString(e.Message)).Append(" Topic: ").Append(e.Topic));
-            receiverQueue.Add(e);//Enqueue(e);
+            receiverQueue.Enqueue(e);
         }
 
         /**
@@ -83,9 +109,9 @@ namespace TopicTrennerAPI.Service
         private void InitAndStartInnerCoroutines()
         {
             //start of the concurrency (Nebenläufig) for receiving Messages
-            receiverQueue = new BlockingCollection<MqttMsgPublishEventArgs>();
+            receiverQueue = new Queue<MqttMsgPublishEventArgs>();
             //start of the concurrency (Nebenläufig) for sending Messages
-            senderQueue = new BlockingCollection<MqttMsgPublishEventArgs>();
+            senderQueue = new Queue<MqttMsgPublishEventArgs>();
             StartInnerCoroutines();
         }
 
@@ -117,13 +143,19 @@ namespace TopicTrennerAPI.Service
         {
             while (isActive)
             {
-                MqttMsgPublishEventArgs e = receiverQueue.Take();
-
-                if (ListTopicReceiver != null)
+                if (receiverQueue.Count > 0)
                 {
-                    foreach (IMqttTopicReceiver receiver in ListTopicReceiver)
+                    MqttMsgPublishEventArgs e = receiverQueue.Dequeue();
+
+                    if (DictTopicReceiver.TryGetValue(e.Topic.ToLower(), out List<IMqttTopicReceiver> listReceiver))
                     {
-                        receiver.OnReceivedMessage(e.Topic, e.Message);
+                        if (listReceiver != null)
+                        {
+                            foreach (IMqttTopicReceiver receiver in listReceiver)
+                            {
+                                receiver.OnReceivedMessage(e.Topic, e.Message);
+                            }
+                        }
                     }
                 }
             }
@@ -137,9 +169,12 @@ namespace TopicTrennerAPI.Service
         {
             while (isActive)
             {
-                MqttMsgPublishEventArgs mqttMessage = senderQueue.Take();
-                client.Publish(mqttMessage.Topic, mqttMessage.Message, mqttMessage.QosLevel, mqttMessage.Retain);
-                Console.WriteLine(new StringBuilder("SEND# Topic: ").Append(mqttMessage.Topic));
+                if (senderQueue.Count > 0)
+                {
+                    MqttMsgPublishEventArgs mqttMessage = senderQueue.Dequeue();
+                    client.Publish(mqttMessage.Topic, mqttMessage.Message, mqttMessage.QosLevel, mqttMessage.Retain);
+                    Console.WriteLine(new StringBuilder("SEND# Topic: ").Append(mqttMessage.Topic));
+                }
             }
         }
 
@@ -156,8 +191,26 @@ namespace TopicTrennerAPI.Service
          */
         public void AddTopicReceiver(string topic, IMqttTopicReceiver receiver, byte MqttQOS_Level)
         {
-            this.ListTopicReceiver.Add(receiver);
-            client.Subscribe(new string[] { topic }, new byte[] { MqttQOS_Level });
+            topic = topic.ToLower();
+
+            //this style for 3.5.Net
+            if (this.DictTopicReceiver.TryGetValue(topic, out List<IMqttTopicReceiver> listReceiver))
+            {
+                listReceiver.Add(receiver);
+                client.Subscribe(new string[] { topic }, new byte[] { MqttQOS_Level });
+
+            }
+            else
+            {
+                listReceiver = new List<IMqttTopicReceiver>
+                {
+                    receiver
+                };
+                this.DictTopicReceiver.Add(topic, listReceiver);
+
+                client.Subscribe(new string[] { topic }, new byte[] { MqttQOS_Level });
+
+            }
         }
 
         /**
@@ -176,12 +229,7 @@ namespace TopicTrennerAPI.Service
         public void PublishMessage(string topic, byte[] Message, byte MqttQOS_Level, bool retain = false)
         {
             Console.WriteLine("sending init");
-            this.senderQueue.Add(new MqttMsgPublishEventArgs(topic, Message, false, MqttQOS_Level, retain));
-        }
-
-        public string Hello()
-        {
-            throw new NotImplementedException();
+            this.senderQueue.Enqueue(new MqttMsgPublishEventArgs(topic, Message, false, MqttQOS_Level, retain));
         }
     }
 }

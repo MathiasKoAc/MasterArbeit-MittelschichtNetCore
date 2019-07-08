@@ -1,27 +1,32 @@
 ﻿using TopicTrennerAPI.Interfaces;
 using TopicTrennerAPI.Models;
+using TopicTrennerAPI.Data;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace TopicTrennerAPI.Service
 {
     public class RuleSessionManager : IControlRuleSessions
     {
-        readonly ILoadTopicRules TopicRuleLoader;
-        readonly IRuleEvaluation RuleEvaluation;
+        readonly ICreateTopicRulesFromSimpleRules topicRuleCreater;
+        readonly DbTopicTrennerContext dbContext;
+        readonly IRuleEvaluation ruleEvaluation;
         int _sessionId = int.MinValue;
 
-        public RuleSessionManager(ILoadTopicRules topicRuleLoader, IRuleEvaluation setupEvaluationRules)
+        public RuleSessionManager(ICreateTopicRulesFromSimpleRules ruleCreater, DbTopicTrennerContext dbContexT, IRuleEvaluation setupEvaluationRules)
         {
-            TopicRuleLoader = topicRuleLoader;
-            RuleEvaluation = setupEvaluationRules;
+            topicRuleCreater = ruleCreater;
+            dbContext = dbContexT;
+            ruleEvaluation = setupEvaluationRules;
         }
 
         public void StartRuleSession(int sessionId)
         {
-            RuleEvaluation.SetTopicRulesAccess(TopicRuleLoader.LoadRules(sessionId, EnumSimpleRuleTyp.access));
-            RuleEvaluation.SetTopicRulesDenyIn(TopicRuleLoader.LoadRules(sessionId, EnumSimpleRuleTyp.denyIn));
-            RuleEvaluation.SetTopicRulesDenyOut(TopicRuleLoader.LoadRules(sessionId, EnumSimpleRuleTyp.denyOut));
+            ruleEvaluation.SetTopicRulesAccess(LoadRules(sessionId, EnumSimpleRuleTyp.access));
+            ruleEvaluation.SetTopicRulesDenyIn(LoadRules(sessionId, EnumSimpleRuleTyp.denyIn));
+            ruleEvaluation.SetTopicRulesDenyOut(LoadRules(sessionId, EnumSimpleRuleTyp.denyOut));
             _sessionId = sessionId;
-            RuleEvaluation.SetRuleEvaluationActive(true);
+            ruleEvaluation.SetRuleEvaluationActive(true);
         }
 
         public bool StopRuleSession(int sessionId)
@@ -30,7 +35,7 @@ namespace TopicTrennerAPI.Service
             {
                 return false;
             }
-            RuleEvaluation.SetRuleEvaluationActive(false);
+            ruleEvaluation.SetRuleEvaluationActive(false);
             _sessionId = int.MinValue;
             return true;
         }
@@ -48,6 +53,21 @@ namespace TopicTrennerAPI.Service
         public int GetSessionId()
         {
             return _sessionId;
+        }
+
+        private Dictionary<string, TopicVertex> LoadRules(int sessionId, EnumSimpleRuleTyp ruleTyp = EnumSimpleRuleTyp.access)
+        {
+            ///dicTv key ist TopicVertex.TopicChain also die TopicPartsKette bis inkl diesem TopicPart
+            Dictionary<string, TopicVertex> topicRules = new Dictionary<string, TopicVertex>();
+
+            topicRuleCreater.CreateTopicRulesFromSimpleRules(ref topicRules, ReadToSimpleRuleList(sessionId, ruleTyp));
+            return topicRules;
+        }
+
+        private List<SimpleRule> ReadToSimpleRuleList(int sessionId, EnumSimpleRuleTyp ruleTyp = EnumSimpleRuleTyp.access)
+        {
+            var rules = dbContext.Rules.Where(r => r.SessionID == sessionId && r.SimpleRuleTyp.Equals(ruleTyp) && r.Active == true);
+            return rules.ToList();
         }
     }
 }
