@@ -8,6 +8,8 @@ namespace TopicTrennerAPI.Models
     public class Session
     {
         public int ID { get; set; }
+        public string Name { get; set; }
+        public string Beschreibung { get; set; }
         public DateTime DateCreated { get; set; } 
         public List<SessionRun> SessionRuns { get; set; }
         public List<SimpleRule> SimpleRules { get; set; }

@@ -46,8 +46,15 @@ namespace TopicTrennerAPI.Controllers
         [HttpPost]
         public void Post(Session sSession)
         {
-            _context.Sessions.Add(sSession);
-            _context.SaveChangesAsync();
+            try
+            {
+                _context.Sessions.Add(sSession);
+                _context.SaveChanges();
+            }
+            catch (DbUpdateException eu) 
+            {
+                var streu = eu.ToString();
+            }
         }
 
         // PUT: api/Session/5
