@@ -51,7 +51,9 @@ namespace TopicTrennerAPI.Service
         {
             while(_acitve)
             {
-                _mqttCon.PublishMessage("simulation/fulldate", (DateTime.Now + _timeDiff).ToLongTimeString(), MqttQualityOfService);
+                _mqttCon.PublishMessage("simulation/fulldate", (DateTime.Now + _timeDiff).ToString("yyyy:MM:ddTHH:mm:ssZ"), MqttQualityOfService);
+                _mqttCon.PublishMessage("simulation/date", (DateTime.Now + _timeDiff).ToString("yyyy:MM:dd"), MqttQualityOfService);
+                _mqttCon.PublishMessage("simulation/time", (DateTime.Now + _timeDiff).ToLongTimeString(), MqttQualityOfService);
                 Thread.Sleep(waitSeconds * 1000);
             }
         }

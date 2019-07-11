@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TopicTrennerAPI.Data;
+using TopicTrennerAPI.Interfaces;
 using TopicTrennerAPI.Models;
 
 namespace TopicTrennerAPI.Controllers
@@ -12,11 +13,13 @@ namespace TopicTrennerAPI.Controllers
     [ApiController]
     public class TimeDiffController : ControllerBase
     {
-        DbTopicTrennerContext _context;
+        readonly DbTopicTrennerContext _context;
+        readonly IControlTimeSession _ctrlTimeSession;
 
-        public TimeDiffController(DbTopicTrennerContext context)
+        public TimeDiffController(DbTopicTrennerContext context, IControlTimeSession controlTimeSession)
         {
             _context = context;
+            _ctrlTimeSession = controlTimeSession;
         }
 
         // GET: api/TimeDiff
@@ -46,7 +49,8 @@ namespace TopicTrennerAPI.Controllers
         public void Post(TimeDiff sTimeDiff)
         {
             _context.TimeDiffs.Add(sTimeDiff);
-            _context.SaveChangesAsync();
+            _context.SaveChanges();
+            ReloadTimeService(sTimeDiff.ID);
         }
 
         // PUT: api/TimeDiff/5
@@ -60,6 +64,7 @@ namespace TopicTrennerAPI.Controllers
 
             _context.Entry(sTimeDiff).State = EntityState.Modified;
             await _context.SaveChangesAsync();
+            ReloadTimeService(sTimeDiff.ID);
             return NoContent();
         }
 
@@ -76,8 +81,15 @@ namespace TopicTrennerAPI.Controllers
 
             _context.TimeDiffs.Remove(TimeDiff);
             await _context.SaveChangesAsync();
+            ReloadTimeService(TimeDiff.ID);
 
             return NoContent();
+        }
+
+        private void ReloadTimeService(int sessionRunId)
+        {
+            var sr = _context.SessionRuns.Where(s => s.ID == sessionRunId).First();
+            _ctrlTimeSession.ReloadTimeService(sr.SessionID);
         }
     }
 }
