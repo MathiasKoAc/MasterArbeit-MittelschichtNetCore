@@ -14,13 +14,15 @@ namespace TopicTrennerAPI.Controllers
     [ApiController]
     public class SessionRunController : ControllerBase
     {
-        DbTopicTrennerContext _context;
-        IControlRuleSessions _ctrlRuleSession;
+        readonly DbTopicTrennerContext _context;
+        readonly IControlRuleSessions _ctrlRuleSession;
+        readonly IControlTimeSession _ctrlTimeSession;
 
-        public SessionRunController(DbTopicTrennerContext context, IControlRuleSessions ctrlRuleSession)
+        public SessionRunController(DbTopicTrennerContext context, IControlRuleSessions ctrlRuleSession, IControlTimeSession controlTimeSession)
         {
             _context = context;
             _ctrlRuleSession = ctrlRuleSession;
+            _ctrlTimeSession = controlTimeSession;
         }
 
         // GET: api/SessionRun
@@ -57,7 +59,9 @@ namespace TopicTrennerAPI.Controllers
 
             if(sessionR.Active)
             {
-                _ctrlRuleSession.StartRuleSession(sessionR.SessionID);
+                int sessId = sessionR.SessionID;
+                _ctrlRuleSession.StartRuleSession(sessId);
+                _ctrlTimeSession.StartTimeService(sessId);
             }
         }
 
@@ -82,10 +86,12 @@ namespace TopicTrennerAPI.Controllers
             {
                 SetAllInactiveActive();
                 _ctrlRuleSession.StartRuleSession(sessionR.SessionID);
+                _ctrlTimeSession.StartTimeService(sessionR.SessionID);
             }
             else if(!sessionR.Active)
             {
                 _ctrlRuleSession.StopRuleSession(sessionR.SessionID);
+                _ctrlTimeSession.StopTimeService(sessionR.SessionID);
             }
 
             oldSessionR.Active = sessionR.Active;
@@ -109,6 +115,12 @@ namespace TopicTrennerAPI.Controllers
                     return NotFound();
                 }
 
+                if(sessionR.Active)
+                {
+                    _ctrlRuleSession.StopRuleSession(sessionR.SessionID);
+                    _ctrlTimeSession.StopTimeService(sessionR.SessionID);
+                }
+                
                 sessionR.Active = false;
                 if(sessionR.StopTime == null)
                 {

@@ -13,7 +13,7 @@ namespace TopicTrennerAPI.Service
         Task runningTask;
 
         //TODO in SETUP CLASS / INTERFACE
-        public static int waitSeconds = 300;
+        public static int waitSeconds = 30;//300;
         public EnumMqttQualityOfService MqttQualityOfService = EnumMqttQualityOfService.QOS_LEVEL_AT_LEAST_ONCE;
 
 
@@ -41,12 +41,18 @@ namespace TopicTrennerAPI.Service
             }
         }
 
+        public void SetTimeServiceActive(bool active, TimeSpan timeDiff)
+        {
+            SetTimeDiff(timeDiff);
+            SetTimeServiceActive(active);
+        }
+
         private void SendTimeLoop()
         {
             while(_acitve)
             {
                 _mqttCon.PublishMessage("simulation/fulldate", (DateTime.Now + _timeDiff).ToLongTimeString(), MqttQualityOfService);
-                Thread.Sleep(300 * 1000);
+                Thread.Sleep(waitSeconds * 1000);
             }
         }
     }

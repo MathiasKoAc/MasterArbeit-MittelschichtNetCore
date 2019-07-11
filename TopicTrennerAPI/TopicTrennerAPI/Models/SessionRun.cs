@@ -14,6 +14,7 @@ namespace TopicTrennerAPI.Models
         public DateTime StartTime { get; set; }
         public DateTime StopTime { get; set; }
         public bool Active { get; set; }
+        public TimeDiff TimeDiff {get; set;}
 
         /*private bool _active;
         public bool Active

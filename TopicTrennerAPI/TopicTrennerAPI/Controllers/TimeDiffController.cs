@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -20,10 +21,9 @@ namespace TopicTrennerAPI.Controllers
 
         // GET: api/TimeDiff
         [HttpGet]
-        public ActionResult<TimeDiff> Get()
+        public ActionResult<IEnumerable<TimeDiff>> Get()
         {
-            var sub = _context.TimeDiffs.Where(t => t.SessionRun.Active == true);
-            return sub.Count() > 0 ? sub.First() : null;
+            return _context.TimeDiffs;
         }
 
         // GET: api/TimeDiff/5

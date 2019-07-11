@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace TopicTrennerAPI.Interfaces
 {
-    interface IControlTimeSession
+    public interface IControlTimeSession
     {
         void StartTimeService(int SessionId);
         void StartTimeService(int SessionId, TimeSpan timeDiff);
