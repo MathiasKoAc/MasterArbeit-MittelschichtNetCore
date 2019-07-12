@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Diese Datei wird vom Veröffentlichungs-/Paketierungsprozess Ihres Webprojekts verwendet. Sie können das Verhalten dieses Prozesses anpassen,
+indem Sie diese MSBuild-Datei bearbeiten. Weitere Informationen hierzu finden Sie unter https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <_PublishTargetUrl>D:\workspace\Master-Pulls\MittelschichtNetCore\TopicTrennerAPI\TopicTrennerAPI\bin\Release\netcoreapp2.1\publish-lin\</_PublishTargetUrl>
+  </PropertyGroup>
+  <ItemGroup>
+    <DestinationConnectionStrings Include="DbDefaultConnection">
+      <Value>Server=192.168.0.148%3b Port=3306%3b Database=smile%3b user=smile%3b Pwd=as7da5sd75po57a5sd7ajnk75jsgjk7svnxsc5v7nkjs7n11kjn7ekjhfg%3b charset=utf8%3b</Value>
+    </DestinationConnectionStrings>
+    <DestinationConnectionStrings Include="MqttDefaulConnectionPasswort">
+      <Value>
+      </Value>
+    </DestinationConnectionStrings>
+    <DestinationConnectionStrings Include="MqttDefaulConnectionServer">
+      <Value>192.168.0.148</Value>
+    </DestinationConnectionStrings>
+    <DestinationConnectionStrings Include="MqttDefaulConnectionUser">
+      <Value>
+      </Value>
+    </DestinationConnectionStrings>
+  </ItemGroup>
+</Project>
