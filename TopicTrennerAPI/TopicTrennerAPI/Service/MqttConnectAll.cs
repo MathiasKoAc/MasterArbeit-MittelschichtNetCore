@@ -186,8 +186,15 @@ namespace TopicTrennerAPI.Service
         {
             isActive = false;
             byte[] a = { 0, 0 };
+
             receiverQueue.Add(new MqttMsgPublishEventArgs("shutdownsmile", a, false, 0x00, false));
             senderQueue.Add(new MqttMsgPublishEventArgs("shutdownsmile", a, false, 0x00, false));
+
+            if (client != null && client.IsConnected)
+            {
+                client.Disconnect();
+            }
+
             Console.WriteLine("MqttConnectAll finished: OnStopApplication");
         }
     }
