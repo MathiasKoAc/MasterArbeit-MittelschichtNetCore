@@ -14,7 +14,7 @@ namespace TopicTrennerAPI.Controllers
     [ApiController]
     public class SessionController : ControllerBase
     {
-        DbTopicTrennerContext _context;
+        readonly DbTopicTrennerContext _context;
 
         public SessionController(DbTopicTrennerContext context)
         {
@@ -46,15 +46,8 @@ namespace TopicTrennerAPI.Controllers
         [HttpPost]
         public void Post(Session sSession)
         {
-            try
-            {
-                _context.Sessions.Add(sSession);
-                _context.SaveChanges();
-            }
-            catch (DbUpdateException eu) 
-            {
-                var streu = eu.ToString();
-            }
+            _context.Sessions.Add(sSession);
+            _context.SaveChanges();
         }
 
         // PUT: api/Session/5

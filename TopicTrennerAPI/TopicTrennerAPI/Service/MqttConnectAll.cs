@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Hosting;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
@@ -21,9 +22,11 @@ namespace TopicTrennerAPI.Service
         private BlockingCollection<MqttMsgPublishEventArgs> receiverQueue;
         private BlockingCollection<MqttMsgPublishEventArgs> senderQueue;
 
-        public MqttConnectAll(IServerConfig serverConfig)
+        public MqttConnectAll(IServerConfig serverConfig, IApplicationLifetime applicationLifttime)
         {
             Start(serverConfig);
+            applicationLifttime.ApplicationStopping.Register(OnStopApplication);
+            Console.WriteLine("MqttConnectAll Started");
         }
 
         public void Start(IServerConfig serverConfig)
@@ -179,9 +182,13 @@ namespace TopicTrennerAPI.Service
             this.senderQueue.Add(new MqttMsgPublishEventArgs(topic, Message, false, MqttQOS_Level, retain));
         }
 
-        public string Hello()
+        private void OnStopApplication()
         {
-            throw new NotImplementedException();
+            isActive = false;
+            byte[] a = { 0, 0 };
+            receiverQueue.Add(new MqttMsgPublishEventArgs("shutdownsmile", a, false, 0x00, false));
+            senderQueue.Add(new MqttMsgPublishEventArgs("shutdownsmile", a, false, 0x00, false));
+            Console.WriteLine("MqttConnectAll finished: OnStopApplication");
         }
     }
 }

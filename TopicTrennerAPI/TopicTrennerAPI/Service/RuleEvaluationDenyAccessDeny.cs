@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TopicTrennerAPI.Models;
 using TopicTrennerAPI.Interfaces;
+using Microsoft.AspNetCore.Hosting;
 
 namespace TopicTrennerAPI.Service
 {
@@ -24,12 +25,14 @@ namespace TopicTrennerAPI.Service
         private volatile bool _active;
 
 
-        public RuleEvaluationDenyAccessDeny(IMqttConnector mqttConnector)
+        public RuleEvaluationDenyAccessDeny(IMqttConnector mqttConnector, IApplicationLifetime applicationLifttime)
         {
             this.mqttCon = mqttConnector;
 
             //TODO checken ob nicht zu häftig:
             this.mqttCon.AddTopicReceiver("#", this, EnumMqttQualityOfService.QOS_LEVEL_EXACTLY_ONCE);
+            applicationLifttime.ApplicationStopping.Register(OnStopApplication);
+            Console.WriteLine("RuleEvaluationDenyAccessDeny Started");
         }
 
         public void OnReceivedMessage(string topic, byte[] message)
@@ -206,7 +209,7 @@ namespace TopicTrennerAPI.Service
                 StringBuilder topicBuild = new StringBuilder();
 
                 bool multiLevelWildModus = false;
-                int i = 0;
+                int i;
                 for (i = 0; i < topicPartsRegel.Count(); i++)
                 {
                     if (topicPartsRegel[i].Equals("+"))
@@ -271,6 +274,12 @@ namespace TopicTrennerAPI.Service
             {
                 _active = active;
             }
+        }
+
+        private void OnStopApplication()
+        {
+            _active = false;
+            Console.WriteLine("RuleEvaluationDenyAccessDeny finished: OnStopApplication");
         }
     }
 }

@@ -51,8 +51,8 @@ namespace TopicTrennerAPI.Controllers
         [HttpPost]
         public void Post(SimpleRule sRule)
         {
-            sRule.InTopic = sRule.InTopic != null ? sRule.InTopic.ToLower() : null;
-            sRule.OutTopic = sRule.OutTopic != null ? sRule.OutTopic.ToLower() : null;
+            sRule.InTopic = sRule.InTopic?.ToLower();
+            sRule.OutTopic = sRule.OutTopic?.ToLower();
 
             _context.Rules.Add(sRule);
             _context.SaveChanges();
@@ -66,15 +66,15 @@ namespace TopicTrennerAPI.Controllers
 
         // PUT: api/Rule/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, SimpleRule sRule)
+        public IActionResult Put(int id, SimpleRule sRule)
         {
-            if(id != sRule.ID)
+            if (id != sRule.ID)
             {
                 return BadRequest();
             }
 
-            sRule.InTopic = sRule.InTopic != null ? sRule.InTopic.ToLower() : null;
-            sRule.OutTopic = sRule.OutTopic != null ? sRule.OutTopic.ToLower() : null;
+            sRule.InTopic = sRule.InTopic?.ToLower();
+            sRule.OutTopic = sRule.OutTopic?.ToLower();
 
             _context.Entry(sRule).State = EntityState.Modified;
             _context.SaveChanges();

@@ -231,5 +231,10 @@ namespace TopicTrennerAPI.Service
             Console.WriteLine("sending init");
             this.senderQueue.Enqueue(new MqttMsgPublishEventArgs(topic, Message, false, MqttQOS_Level, retain));
         }
+
+        public static void Shutdown()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -14,7 +14,7 @@ namespace TopicTrennerAPI.Controllers
     [ApiController]
     public class SubjectController : ControllerBase
     {
-        DbTopicTrennerContext _context;
+        readonly DbTopicTrennerContext _context;
 
         public SubjectController(DbTopicTrennerContext context)
         {

@@ -2,6 +2,7 @@
 using TopicTrennerAPI.Interfaces;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 
 namespace TopicTrennerAPI.Service
 {
@@ -17,9 +18,12 @@ namespace TopicTrennerAPI.Service
         public EnumMqttQualityOfService MqttQualityOfService = EnumMqttQualityOfService.QOS_LEVEL_AT_LEAST_ONCE;
 
 
-        public MqttTimeService(IMqttConnector mqttConnector)
+        public MqttTimeService(IMqttConnector mqttConnector, IApplicationLifetime applicationLifttime)
         {
             _mqttCon = mqttConnector;
+            applicationLifttime.ApplicationStopping.Register(OnStopApplication);
+            Console.WriteLine("MqttTimeService Started");
+
         }
 
         public bool IsTimeServiceActive()
@@ -54,8 +58,18 @@ namespace TopicTrennerAPI.Service
                 _mqttCon.PublishMessage("simulation/fulldate", (DateTime.Now + _timeDiff).ToString("yyyy:MM:ddTHH:mm:ssZ"), MqttQualityOfService);
                 _mqttCon.PublishMessage("simulation/date", (DateTime.Now + _timeDiff).ToString("yyyy:MM:dd"), MqttQualityOfService);
                 _mqttCon.PublishMessage("simulation/time", (DateTime.Now + _timeDiff).ToLongTimeString(), MqttQualityOfService);
-                Thread.Sleep(waitSeconds * 1000);
+
+                for (int i = 0; i < waitSeconds && _acitve; i++)
+                {
+                    Thread.Sleep(1000);
+                }
             }
+        }
+
+        private void OnStopApplication()
+        {
+            _acitve = false;
+            Console.WriteLine("MqttTimeService finished: OnStopApplication");
         }
     }
 }
