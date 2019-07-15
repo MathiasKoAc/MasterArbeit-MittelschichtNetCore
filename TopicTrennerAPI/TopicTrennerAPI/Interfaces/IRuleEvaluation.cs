@@ -14,5 +14,6 @@ namespace TopicTrennerAPI.Interfaces
 
         bool IsRuleEvaluationActive();
         void SetRuleEvaluationActive(bool active);
+        int GetActiveSessionId();
     }
 }
