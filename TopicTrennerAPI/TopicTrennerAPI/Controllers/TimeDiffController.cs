@@ -59,6 +59,14 @@ namespace TopicTrennerAPI.Controllers
             {
                 return BadRequest();
             }
+            if(_context.SessionRuns.Where(s => s.ID == id).First().Active)
+            {
+                if(_context.TimeDiffs.Find(id).Diff > sTimeDiff.Diff)
+                {
+                    // if the Session is Active Time shift in the past is not alowed
+                    return BadRequest();
+                }
+            }
 
             _context.Entry(sTimeDiff).State = EntityState.Modified;
             await _context.SaveChangesAsync();
