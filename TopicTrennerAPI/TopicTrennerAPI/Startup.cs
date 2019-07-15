@@ -29,7 +29,7 @@ namespace TopicTrennerAPI
             services.AddSingleton<IMqttConnector, MqttConnectAll>();
             services.AddSingleton<IRuleEvaluation, RuleEvaluationDenyAccessDeny>();
             services.AddTransient<ICreateTopicRulesFromSimpleRules, TopicRuleFactory>();
-            services.AddScoped<IControlRuleSessions, RuleSessionManager>();
+            services.AddScoped<IManageRuleService, RuleServiceManager>();
             services.AddSingleton<IServeTime, MqttTimeService>();
             services.AddScoped<IControlTimeSession, TimeSessionManager>();
 

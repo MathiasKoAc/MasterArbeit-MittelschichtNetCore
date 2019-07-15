@@ -17,9 +17,9 @@ namespace TopicTrennerAPI.Controllers
         //Controller for Model typ SimpleRule
 
         readonly DbTopicTrennerContext _context;
-        readonly IControlRuleSessions _ctrlRuleSession;
+        readonly IManageRuleService _ctrlRuleSession;
 
-        public RuleController(DbTopicTrennerContext context, IControlRuleSessions ctrlRuleSession)
+        public RuleController(DbTopicTrennerContext context, IManageRuleService ctrlRuleSession)
         {
             _context = context;
             _ctrlRuleSession = ctrlRuleSession;

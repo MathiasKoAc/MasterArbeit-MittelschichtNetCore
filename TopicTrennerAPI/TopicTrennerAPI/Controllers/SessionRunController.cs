@@ -15,10 +15,10 @@ namespace TopicTrennerAPI.Controllers
     public class SessionRunController : ControllerBase
     {
         readonly DbTopicTrennerContext _context;
-        readonly IControlRuleSessions _ctrlRuleSession;
+        readonly IManageRuleService _ctrlRuleSession;
         readonly IControlTimeSession _ctrlTimeSession;
 
-        public SessionRunController(DbTopicTrennerContext context, IControlRuleSessions ctrlRuleSession, IControlTimeSession controlTimeSession)
+        public SessionRunController(DbTopicTrennerContext context, IManageRuleService ctrlRuleSession, IControlTimeSession controlTimeSession)
         {
             _context = context;
             _ctrlRuleSession = ctrlRuleSession;

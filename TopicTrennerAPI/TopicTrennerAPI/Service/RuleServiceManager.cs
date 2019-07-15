@@ -6,59 +6,45 @@ using System.Linq;
 
 namespace TopicTrennerAPI.Service
 {
-    public class RuleSessionManager : IControlRuleSessions
+    public class RuleServiceManager : IManageRuleService
     {
         readonly ICreateTopicRulesFromSimpleRules topicRuleCreater;
         readonly DbTopicTrennerContext dbContext;
         readonly IRuleEvaluation ruleEvaluation;
-        int _sessionId = int.MinValue;
 
-        public RuleSessionManager(ICreateTopicRulesFromSimpleRules ruleCreater, DbTopicTrennerContext dbContexT, IRuleEvaluation setupEvaluationRules)
+        public RuleServiceManager(ICreateTopicRulesFromSimpleRules ruleCreater, DbTopicTrennerContext dbContexT, IRuleEvaluation setupEvaluationRules)
         {
             topicRuleCreater = ruleCreater;
             dbContext = dbContexT;
             ruleEvaluation = setupEvaluationRules;
         }
 
-        public void StartRuleSession(int sessionId)
+        public void StartRuleSession(int sessionRunId)
         {
-            ruleEvaluation.SetTopicRulesAccess(LoadRules(sessionId, EnumSimpleRuleTyp.access));
-            ruleEvaluation.SetTopicRulesDenyIn(LoadRules(sessionId, EnumSimpleRuleTyp.denyIn));
-            ruleEvaluation.SetTopicRulesDenyOut(LoadRules(sessionId, EnumSimpleRuleTyp.denyOut));
-            _sessionId = sessionId;
+            ruleEvaluation.SetTopicRulesAccess(LoadRules(sessionRunId, EnumSimpleRuleTyp.access));
+            ruleEvaluation.SetTopicRulesDenyIn(LoadRules(sessionRunId, EnumSimpleRuleTyp.denyIn));
+            ruleEvaluation.SetTopicRulesDenyOut(LoadRules(sessionRunId, EnumSimpleRuleTyp.denyOut));
             ruleEvaluation.SetRuleEvaluationActive(true);
         }
 
-        public bool StopRuleSession(int sessionId)
+        public bool StopRuleSession(int sessionRunId)
         {
-            if (_sessionId != int.MinValue && _sessionId != sessionId)
-            {
-                return false;
-            }
             ruleEvaluation.SetRuleEvaluationActive(false);
-            _sessionId = int.MinValue;
-            return true;
+            return true; //TODO rückgaben lösen
         }
 
-        public bool ReloadRules(int sessionId)
+        public bool ReloadRules(int sessionRunId)
         {
-            if (_sessionId != int.MinValue && _sessionId != sessionId)
-            {
-                return false;
-            }
-            StartRuleSession(sessionId);
-            return true;
+            StartRuleSession(sessionRunId);
+            return true; //TODO rückgaben lösen
         }
 
-        public int GetSessionId()
-        {
-            return _sessionId;
-        }
-
-        private Dictionary<string, TopicVertex> LoadRules(int sessionId, EnumSimpleRuleTyp ruleTyp = EnumSimpleRuleTyp.access)
+        private Dictionary<string, TopicVertex> LoadRules(int sessionRunId, EnumSimpleRuleTyp ruleTyp = EnumSimpleRuleTyp.access)
         {
             ///dicTv key ist TopicVertex.TopicChain also die TopicPartsKette bis inkl diesem TopicPart
             Dictionary<string, TopicVertex> topicRules = new Dictionary<string, TopicVertex>();
+
+            var sessionId = dbContext.SessionRuns.Where(s => s.ID == sessionRunId).First().SessionID;
 
             topicRuleCreater.CreateTopicRulesFromSimpleRules(ref topicRules, ReadToSimpleRuleList(sessionId, ruleTyp));
             return topicRules;
