@@ -27,11 +27,11 @@ namespace TopicTrennerAPI
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddTransient<IServerConfig, ServerConfigConnectionString>();
             services.AddSingleton<IMqttConnector, MqttConnectAll>();
-            services.AddSingleton<IRuleEvaluation, RuleEvaluationDenyAccessDeny>();
+            services.AddSingleton<IServeRuleEvaluation, RuleEvaluationDenyAccessDeny>();
             services.AddTransient<ICreateTopicRulesFromSimpleRules, TopicRuleFactory>();
             services.AddScoped<IManageRuleService, RuleServiceManager>();
             services.AddSingleton<IServeTime, MqttTimeService>();
-            services.AddScoped<IManageTimeService, TimeSessionManager>();
+            services.AddScoped<IManageTimeService, TimeServiceManager>();
 
         }
 

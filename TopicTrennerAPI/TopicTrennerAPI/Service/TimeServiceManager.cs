@@ -8,13 +8,13 @@ using TopicTrennerAPI.Data;
 
 namespace TopicTrennerAPI.Service
 {
-    public class TimeSessionManager : IManageTimeService
+    public class TimeServiceManager : IManageTimeService
     {
         readonly DbTopicTrennerContext _dbcontext;
         readonly IServeTime _serveTime;
 
 
-        public TimeSessionManager(DbTopicTrennerContext dbContexT, IServeTime serveTime)
+        public TimeServiceManager(DbTopicTrennerContext dbContexT, IServeTime serveTime)
         {
             _dbcontext = dbContexT;
             _serveTime = serveTime;

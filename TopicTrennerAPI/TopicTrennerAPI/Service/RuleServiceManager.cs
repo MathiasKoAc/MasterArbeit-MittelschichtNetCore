@@ -10,9 +10,9 @@ namespace TopicTrennerAPI.Service
     {
         readonly ICreateTopicRulesFromSimpleRules topicRuleCreater;
         readonly DbTopicTrennerContext dbContext;
-        readonly IRuleEvaluation ruleEvaluation;
+        readonly IServeRuleEvaluation ruleEvaluation;
 
-        public RuleServiceManager(ICreateTopicRulesFromSimpleRules ruleCreater, DbTopicTrennerContext dbContexT, IRuleEvaluation setupEvaluationRules)
+        public RuleServiceManager(ICreateTopicRulesFromSimpleRules ruleCreater, DbTopicTrennerContext dbContexT, IServeRuleEvaluation setupEvaluationRules)
         {
             topicRuleCreater = ruleCreater;
             dbContext = dbContexT;

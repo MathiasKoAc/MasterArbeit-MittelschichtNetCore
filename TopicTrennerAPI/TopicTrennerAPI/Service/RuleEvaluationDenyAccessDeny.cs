@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 namespace TopicTrennerAPI.Service
 {
     //alternativ Implementierung von RuleEvaluationService um DenyAccessDeny zu ermöglichen
-    public class RuleEvaluationDenyAccessDeny : IMqttTopicReceiver, IRuleEvaluation
+    public class RuleEvaluationDenyAccessDeny : IMqttTopicReceiver, IServeRuleEvaluation
     {
         readonly IMqttConnector mqttCon;
 
