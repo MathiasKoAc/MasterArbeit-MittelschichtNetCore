@@ -50,6 +50,8 @@ namespace TopicTrennerAPI.Controllers
         [HttpPost]
         public void Post(SessionRun sessionR)
         {
+            //TODO umbauen rückgabe von START/STOP einbauen
+
             if (sessionR.Active)
             {
                 SetAllInactiveActive();
@@ -59,9 +61,8 @@ namespace TopicTrennerAPI.Controllers
 
             if(sessionR.Active)
             {
-                int sessId = sessionR.SessionID;
-                _ctrlRuleSession.StartRuleSession(sessId);
-                _ctrlTimeSession.StartTimeService(sessId);
+                _ctrlRuleSession.StartRuleSession(sessionR.ID);
+                _ctrlTimeSession.StartTimeService(sessionR.ID);
             }
         }
 
@@ -69,6 +70,8 @@ namespace TopicTrennerAPI.Controllers
         [HttpPut("{id}")]
         public IActionResult Put(int id, SessionRun sessionR)
         {
+            //TODO umbauen rückgabe von START/STOP einbauen
+
             if (id != sessionR.ID)
             {
                 //we dont change IDs
@@ -85,13 +88,13 @@ namespace TopicTrennerAPI.Controllers
             if (sessionR.Active)
             {
                 SetAllInactiveActive();
-                _ctrlRuleSession.StartRuleSession(sessionR.SessionID);
-                _ctrlTimeSession.StartTimeService(sessionR.SessionID);
+                _ctrlRuleSession.StartRuleSession(sessionR.ID);
+                _ctrlTimeSession.StartTimeService(sessionR.ID);
             }
             else if(!sessionR.Active)
             {
-                _ctrlRuleSession.StopRuleSession(sessionR.SessionID);
-                _ctrlTimeSession.StopTimeService(sessionR.SessionID);
+                _ctrlRuleSession.StopRuleSession(sessionR.ID);
+                _ctrlTimeSession.StopTimeService(sessionR.ID);
             }
 
             oldSessionR.Active = sessionR.Active;
@@ -107,6 +110,8 @@ namespace TopicTrennerAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
+            //TODO umbauen rückgabe von START/STOP einbauen
+
             if (_context.SessionRuns.Count() > 0)
             {
                 var sessionR = await _context.SessionRuns.FindAsync(id);
