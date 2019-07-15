@@ -14,9 +14,9 @@ namespace TopicTrennerAPI.Controllers
     public class TimeDiffController : ControllerBase
     {
         readonly DbTopicTrennerContext _context;
-        readonly IControlTimeSession _ctrlTimeSession;
+        readonly IManageTimeService _ctrlTimeSession;
 
-        public TimeDiffController(DbTopicTrennerContext context, IControlTimeSession controlTimeSession)
+        public TimeDiffController(DbTopicTrennerContext context, IManageTimeService controlTimeSession)
         {
             _context = context;
             _ctrlTimeSession = controlTimeSession;

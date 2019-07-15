@@ -16,9 +16,9 @@ namespace TopicTrennerAPI.Controllers
     {
         readonly DbTopicTrennerContext _context;
         readonly IManageRuleService _ctrlRuleSession;
-        readonly IControlTimeSession _ctrlTimeSession;
+        readonly IManageTimeService _ctrlTimeSession;
 
-        public SessionRunController(DbTopicTrennerContext context, IManageRuleService ctrlRuleSession, IControlTimeSession controlTimeSession)
+        public SessionRunController(DbTopicTrennerContext context, IManageRuleService ctrlRuleSession, IManageTimeService controlTimeSession)
         {
             _context = context;
             _ctrlRuleSession = ctrlRuleSession;

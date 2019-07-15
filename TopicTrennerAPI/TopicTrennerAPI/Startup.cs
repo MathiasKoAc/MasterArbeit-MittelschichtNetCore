@@ -31,7 +31,7 @@ namespace TopicTrennerAPI
             services.AddTransient<ICreateTopicRulesFromSimpleRules, TopicRuleFactory>();
             services.AddScoped<IManageRuleService, RuleServiceManager>();
             services.AddSingleton<IServeTime, MqttTimeService>();
-            services.AddScoped<IControlTimeSession, TimeSessionManager>();
+            services.AddScoped<IManageTimeService, TimeSessionManager>();
 
         }
 

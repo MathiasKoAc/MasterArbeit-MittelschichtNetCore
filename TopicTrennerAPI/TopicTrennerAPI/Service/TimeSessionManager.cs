@@ -8,7 +8,7 @@ using TopicTrennerAPI.Data;
 
 namespace TopicTrennerAPI.Service
 {
-    public class TimeSessionManager : IControlTimeSession
+    public class TimeSessionManager : IManageTimeService
     {
         readonly DbTopicTrennerContext _dbcontext;
         readonly IServeTime _serveTime;
@@ -20,13 +20,13 @@ namespace TopicTrennerAPI.Service
             _serveTime = serveTime;
         }
 
-        public void ReloadTimeService(int SessionId)
+        public void ReloadTimeService(int SessionRunId)
         {
-            var diff = _dbcontext.TimeDiffs.Where(t => t.ID == SessionId).First();
-            ReloadTimeService(SessionId, diff.Diff);
+            var diff = _dbcontext.TimeDiffs.Where(t => t.ID == SessionRunId).First();
+            ReloadTimeService(SessionRunId, diff.Diff);
         }
 
-        public void ReloadTimeService(int SessionId, TimeSpan timeDiff)
+        public void ReloadTimeService(int SessionRunId, TimeSpan timeDiff)
         {
             _serveTime.SetTimeDiff(timeDiff);
 
@@ -36,18 +36,18 @@ namespace TopicTrennerAPI.Service
             }
         }
 
-        public void StartTimeService(int SessionId)
+        public void StartTimeService(int SessionRunId)
         {
-            var diff = _dbcontext.TimeDiffs.Where(t => t.ID == SessionId).First();
+            var diff = _dbcontext.TimeDiffs.Where(t => t.ID == SessionRunId).First();
             _serveTime.SetTimeServiceActive(true, diff.Diff);
         }
 
-        public void StartTimeService(int SessionId, TimeSpan timeDiff)
+        public void StartTimeService(int SessionRunId, TimeSpan timeDiff)
         {
             _serveTime.SetTimeServiceActive(true, timeDiff);
         }
 
-        public void StopTimeService(int SessionId)
+        public void StopTimeService(int SessionRunId)
         {
             _serveTime.SetTimeServiceActive(false);
         }
