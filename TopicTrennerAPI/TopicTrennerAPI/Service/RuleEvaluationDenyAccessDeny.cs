@@ -281,10 +281,5 @@ namespace TopicTrennerAPI.Service
             _active = false;
             Console.WriteLine("RuleEvaluationDenyAccessDeny finished: OnStopApplication");
         }
-
-        public int GetActiveSessionId()
-        {
-            throw new NotImplementedException();
-        }
     }
 }
