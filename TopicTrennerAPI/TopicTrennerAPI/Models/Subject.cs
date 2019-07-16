@@ -11,5 +11,6 @@ namespace TopicTrennerAPI.Models
         public string Name { get; set; }
         public EnumSubjectTyp SubjectTyp { get; set; }
         public List<SimpleRuleSubject> SimpleRuleSubjects { get; set; }
+        public List<PurposeMessage> PurposeMessages { get; set; }
     }
 }
