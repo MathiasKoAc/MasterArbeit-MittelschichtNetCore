@@ -42,10 +42,17 @@ namespace TopicTrennerAPI.Controllers
 
         // POST: api/Session
         [HttpPost]
-        public void Post(PurposeMessage purposeMessage)
+        public IActionResult Post(PurposeMessage purposeMessage)
         {
+            if (purposeMessage.ID != 0 && _context.Logs.Find(purposeMessage.ID) != null)
+            {
+                return BadRequest();
+            }
+
             _context.PurposeMessages.Add(purposeMessage);
             _context.SaveChanges();
+
+            return NoContent();
         }
 
         [HttpPut("{id}")]

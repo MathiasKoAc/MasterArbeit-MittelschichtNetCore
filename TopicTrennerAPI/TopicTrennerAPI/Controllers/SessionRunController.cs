@@ -53,7 +53,7 @@ namespace TopicTrennerAPI.Controllers
         public IActionResult Post(SessionRun sessionR)
         {
             //TODO umbauen rückgabe von START/STOP einbauen
-            if(sessionR.ID != null && _context.SessionRuns.Find(sessionR.ID) != null)
+            if(sessionR.ID != 0 && _context.SessionRuns.Find(sessionR.ID) != null)
             {
                 return BadRequest();
             }

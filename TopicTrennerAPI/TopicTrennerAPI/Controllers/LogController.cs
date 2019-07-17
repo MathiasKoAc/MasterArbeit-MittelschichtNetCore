@@ -43,10 +43,17 @@ namespace TopicTrennerAPI.Controllers
 
         // POST: api/Session
         [HttpPost]
-        public void Post(Log l)
+        public IActionResult Post(Log l)
         {
+            if(l.ID != 0 && _context.Logs.Find(l.ID) != null)
+            {
+                return BadRequest();
+            }
+
             _context.Logs.Add(l);
             _context.SaveChanges();
+
+            return NoContent();
         }
 
         [HttpPut("{id}")]

@@ -49,8 +49,13 @@ namespace TopicTrennerAPI.Controllers
 
         // POST: api/Rule
         [HttpPost]
-        public void Post(SimpleRule sRule)
+        public IActionResult Post(SimpleRule sRule)
         {
+            if (sRule.ID != 0 && _context.Logs.Find(sRule.ID) != null)
+            {
+                return BadRequest();
+            }
+
             sRule.InTopic = sRule.InTopic?.ToLower();
             sRule.OutTopic = sRule.OutTopic?.ToLower();
 
@@ -58,6 +63,7 @@ namespace TopicTrennerAPI.Controllers
             _context.SaveChanges();
 
             ReloadSessionRun(sRule.SessionID);
+            return NoContent();
         }
 
         // PUT: api/Rule/5

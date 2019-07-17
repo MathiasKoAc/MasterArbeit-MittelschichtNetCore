@@ -44,11 +44,18 @@ namespace TopicTrennerAPI.Controllers
 
         // POST: api/TimeDiff
         [HttpPost]
-        public void Post(TimeDiff sTimeDiff)
+        public IActionResult Post(TimeDiff sTimeDiff)
         {
+            if (sTimeDiff.ID != 0 && _context.Logs.Find(sTimeDiff.ID) != null)
+            {
+                return BadRequest();
+            }
+
             _context.TimeDiffs.Add(sTimeDiff);
             _context.SaveChanges();
             _ctrlTimeSession.ReloadTimeService(sTimeDiff.ID);
+
+            return NoContent();
         }
 
         // PUT: api/TimeDiff/5

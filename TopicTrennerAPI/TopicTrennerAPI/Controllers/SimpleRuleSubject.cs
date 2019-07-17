@@ -44,10 +44,17 @@ namespace TopicTrennerAPI.Controllers
 
         // POST: api/SimpleRuleSubject
         [HttpPost]
-        public void Post(SimpleRuleSubject sSimpleRuleSubject)
+        public IActionResult Post(SimpleRuleSubject sSimpleRuleSubject)
         {
+            if (sSimpleRuleSubject.ID != 0 && _context.Logs.Find(sSimpleRuleSubject.ID) != null)
+            {
+                return BadRequest();
+            }
+
             _context.SimpleRuleSubjects.Add(sSimpleRuleSubject);
             _context.SaveChangesAsync();
+
+            return NoContent();
         }
 
         // PUT: api/SimpleRuleSubject/5
