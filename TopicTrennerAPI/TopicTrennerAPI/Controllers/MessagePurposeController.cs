@@ -44,7 +44,7 @@ namespace TopicTrennerAPI.Controllers
         [HttpPost]
         public IActionResult Post(PurposeMessage purposeMessage)
         {
-            if (purposeMessage.ID != 0 && _context.Logs.Find(purposeMessage.ID) != null)
+            if (purposeMessage.ID != 0 && _context.PurposeMessages.Find(purposeMessage.ID) != null)
             {
                 return BadRequest();
             }

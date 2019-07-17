@@ -46,7 +46,7 @@ namespace TopicTrennerAPI.Controllers
         [HttpPost]
         public IActionResult Post(Session sSession)
         {
-            if (sSession.ID != 0 && _context.Logs.Find(sSession.ID) != null)
+            if (sSession.ID != 0 && _context.Sessions.Find(sSession.ID) != null)
             {
                 return BadRequest();
             }

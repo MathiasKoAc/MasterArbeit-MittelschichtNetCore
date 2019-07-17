@@ -46,7 +46,7 @@ namespace TopicTrennerAPI.Controllers
         [HttpPost]
         public IActionResult Post(SimpleRuleSubject sSimpleRuleSubject)
         {
-            if (sSimpleRuleSubject.ID != 0 && _context.Logs.Find(sSimpleRuleSubject.ID) != null)
+            if (sSimpleRuleSubject.ID != 0 && _context.SimpleRuleSubjects.Find(sSimpleRuleSubject.ID) != null)
             {
                 return BadRequest();
             }

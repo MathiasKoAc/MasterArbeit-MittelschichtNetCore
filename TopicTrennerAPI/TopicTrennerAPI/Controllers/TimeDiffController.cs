@@ -46,7 +46,7 @@ namespace TopicTrennerAPI.Controllers
         [HttpPost]
         public IActionResult Post(TimeDiff sTimeDiff)
         {
-            if (sTimeDiff.ID != 0 && _context.Logs.Find(sTimeDiff.ID) != null)
+            if (sTimeDiff.ID != 0 && _context.TimeDiffs.Find(sTimeDiff.ID) != null)
             {
                 return BadRequest();
             }

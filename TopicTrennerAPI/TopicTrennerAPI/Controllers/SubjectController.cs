@@ -46,7 +46,7 @@ namespace TopicTrennerAPI.Controllers
         [HttpPost]
         public IActionResult Post(Subject sSubject)
         {
-            if (sSubject.ID != 0 && _context.Logs.Find(sSubject.ID) != null)
+            if (sSubject.ID != 0 && _context.Subjects.Find(sSubject.ID) != null)
             {
                 return BadRequest();
             }
