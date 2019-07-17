@@ -50,9 +50,13 @@ namespace TopicTrennerAPI.Controllers
 
         // POST: api/SessionRun
         [HttpPost]
-        public void Post(SessionRun sessionR)
+        public IActionResult Post(SessionRun sessionR)
         {
             //TODO umbauen rückgabe von START/STOP einbauen
+            if(sessionR.ID != null && _context.SessionRuns.Find(sessionR.ID) != null)
+            {
+                return BadRequest();
+            }
 
             if (sessionR.Active)
             {
@@ -65,6 +69,7 @@ namespace TopicTrennerAPI.Controllers
             {
                 StartSessionRun(sessionR.ID);
             }
+            return NoContent();
         }
 
         // PUT: api/SessionRun/5

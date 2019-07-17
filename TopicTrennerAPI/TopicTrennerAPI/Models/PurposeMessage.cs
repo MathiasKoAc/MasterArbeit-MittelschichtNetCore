@@ -5,7 +5,7 @@ namespace TopicTrennerAPI.Models
 {
     public class PurposeMessage : MqttMessage
     {
-        public int ID;
+        public int ID { get; set; }
         public EnumPurposeMessageTyp MessageTyp { get; set; }
         public int SubjectId { get; set; }
         public Subject Subject { get; set; }

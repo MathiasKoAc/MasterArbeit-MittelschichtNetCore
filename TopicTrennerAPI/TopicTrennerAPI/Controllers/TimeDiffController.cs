@@ -53,23 +53,26 @@ namespace TopicTrennerAPI.Controllers
 
         // PUT: api/TimeDiff/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, TimeDiff sTimeDiff)
+        public IActionResult Put(int id, TimeDiff sTimeDiff)
         {
             if (id != sTimeDiff.ID)
             {
                 return BadRequest();
             }
-            if(_context.SessionRuns.Where(s => s.ID == id).First().Active)
+            var dbDiff = _context.TimeDiffs.Find(id);
+
+            if (_context.SessionRuns.Where(s => s.ID == id).First().Active)
             {
-                if(_context.TimeDiffs.Find(id).Diff > sTimeDiff.Diff)
+                if(dbDiff.Diff > sTimeDiff.Diff)
                 {
                     // if the Session is Active Time shift in the past is not alowed
                     return BadRequest();
                 }
             }
 
-            _context.Entry(sTimeDiff).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            dbDiff.Diff = sTimeDiff.Diff;
+            _context.Entry(dbDiff).State = EntityState.Modified;
+            _context.SaveChanges();
             _ctrlTimeSession.ReloadTimeService(sTimeDiff.ID);
             return NoContent();
         }

@@ -23,7 +23,9 @@ namespace TopicTrennerAPI.Service
         public void ReloadTimeService(int SessionRunId)
         {
             var diff = _dbcontext.TimeDiffs.Where(t => t.ID == SessionRunId).First();
-            ReloadTimeService(SessionRunId, diff.Diff);
+            TimeSpan d = (diff == null || diff.Diff == null) ? TimeSpan.Zero : diff.Diff;
+            ReloadTimeService(SessionRunId, d);
+
         }
 
         public void ReloadTimeService(int SessionRunId, TimeSpan timeDiff)
@@ -38,8 +40,9 @@ namespace TopicTrennerAPI.Service
 
         public void StartTimeService(int SessionRunId)
         {
-            var diff = _dbcontext.TimeDiffs.Where(t => t.ID == SessionRunId).First();
-            _serveTime.SetTimeServiceActive(true, diff.Diff);
+            var diff = _dbcontext.TimeDiffs.Find(SessionRunId);
+            TimeSpan d = (diff == null || diff.Diff == null) ? TimeSpan.Zero : diff.Diff;
+            _serveTime.SetTimeServiceActive(true, d);
         }
 
         public void StartTimeService(int SessionRunId, TimeSpan timeDiff)

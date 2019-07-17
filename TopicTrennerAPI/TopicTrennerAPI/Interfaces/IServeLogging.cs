@@ -9,7 +9,6 @@ namespace TopicTrennerAPI.Interfaces
 {
     public interface IServeLogging
     {
-        void SetDbContext(DbTopicTrennerContext context);
         bool IsLoggingActive();
         void SetLoggingActive(int sessionRunId, bool active);
     }

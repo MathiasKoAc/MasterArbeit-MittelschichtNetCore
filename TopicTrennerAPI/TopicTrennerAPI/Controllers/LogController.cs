@@ -12,29 +12,30 @@ namespace TopicTrennerAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MessagePurposeController : ControllerBase
+    public class LogController : ControllerBase
     {
         readonly DbTopicTrennerContext _context;
 
-        public MessagePurposeController(DbTopicTrennerContext context)
+        public LogController(DbTopicTrennerContext context)
         {
             _context = context;
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<PurposeMessage>> Get()
+        public ActionResult<IEnumerable<Log>> Get()
         {
-            var sub = _context.PurposeMessages;
+            //TODO ggf platzt es hier weil zu viele Daten
+            var sub = _context.Logs;
             return sub;
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<PurposeMessage>> Get(int id)
+        public async Task<ActionResult<Log>> Get(int id)
         {
-            if (_context.PurposeMessages.Count() > 0)
+            if (_context.Logs.Count() > 0)
             {
-                var PurposeMessage = await _context.PurposeMessages.FindAsync(id);
-                return PurposeMessage;
+                var Log = await _context.Logs.FindAsync(id);
+                return Log;
             }
 
             return null;
@@ -42,21 +43,21 @@ namespace TopicTrennerAPI.Controllers
 
         // POST: api/Session
         [HttpPost]
-        public void Post(PurposeMessage purposeMessage)
+        public void Post(Log l)
         {
-            _context.PurposeMessages.Add(purposeMessage);
+            _context.Logs.Add(l);
             _context.SaveChanges();
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, PurposeMessage purposeMessage)
+        public async Task<IActionResult> Put(int id, Log l)
         {
-            if(id != purposeMessage.ID)
+            if(id != l.ID)
             {
                 return BadRequest();
             }
 
-            _context.Entry(purposeMessage).State = EntityState.Modified;
+            _context.Entry(l).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return NoContent();
         }
@@ -64,14 +65,14 @@ namespace TopicTrennerAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var purposeMessage = await _context.PurposeMessages.FindAsync(id);
+            var l = await _context.Logs.FindAsync(id);
 
-            if (purposeMessage == null)
+            if (l == null)
             {
                 return NotFound();
             }
 
-            _context.PurposeMessages.Remove(purposeMessage);
+            _context.Logs.Remove(l);
             await _context.SaveChangesAsync();
 
             return NoContent();

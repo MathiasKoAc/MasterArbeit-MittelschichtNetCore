@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using TopicTrennerAPI.Models;
@@ -9,20 +11,24 @@ using Microsoft.Extensions.Configuration;
 
 namespace TopicTrennerAPI.Service
 {
-    public class LogServiceInDbContext : IServeLogging, IMqttTopicReceiver
+    public class LogServiceInJsonFile : IServeLogging, IMqttTopicReceiver
     {
+        readonly IConfiguration _config;
         readonly IMqttConnector _mqttCon;
-        private static DbTopicTrennerContext _context;
         private bool _active;
         private int _sessionRunId = int.MinValue;
+        private string logPath;
+        private StreamWriter writer;
 
-        public LogServiceInDbContext(IMqttConnector mqttConnector, IApplicationLifetime applicationLifttime, IConfiguration config)
+        public LogServiceInJsonFile(IMqttConnector mqttConnector, IApplicationLifetime applicationLifttime, IConfiguration config)
         {
+            throw new NotImplementedException("Klasse nicht feritg");
             _mqttCon = mqttConnector;
+            _config = config;
             applicationLifttime.ApplicationStopping.Register(OnStopApplication);
-            SetupDbCorrect(config.GetConnectionString("DbDefaultConnection"));
-            _mqttCon.AddTopicReceiver("#", this);
             Console.WriteLine("LogServiceInDbContext Started");
+            logPath = _config.GetConnectionString("LogFilePath");
+            _mqttCon.AddTopicReceiver("#", this);
         }
 
         public bool IsLoggingActive()
@@ -30,14 +36,13 @@ namespace TopicTrennerAPI.Service
             return _active;
         }
 
+        public void SetDbContext(DbTopicTrennerContext context)
+        {
+            //_context = context;
+        }
+
         public void SetLoggingActive(int sessionRunId, bool active)
         {
-            if (_context == null && active)
-            {
-                throw new Exception("No DbContext setup for LogServiceInDbContext, please setup Context to this");
-            }
-
-            
             if (active)
             {
                 _active = true;
@@ -51,7 +56,11 @@ namespace TopicTrennerAPI.Service
             
         }
 
-
+        private void OnStopApplication()
+        {
+            _active = false;
+            Console.WriteLine("LogServiceInDbContext finished: OnStopApplication");
+        }
 
         public void OnReceivedMessage(string topic, byte[] message)
         {
@@ -61,26 +70,14 @@ namespace TopicTrennerAPI.Service
             }
 
             Log l = new Log();
+            l.ID = 1;
             l.SetMessageUft8Byte(message);
             l.Topic = topic;
             l.SessionRunID = _sessionRunId;
 
             //TODO Problem beheben hier kann ich nicht auf die Datenbank zugreifen!
-            _context.Logs.Add(l);
-            _context.SaveChanges();
-        }
-
-        private void SetupDbCorrect(string config)
-        {
-            DbTopicTrennerContext.DbConfigString = config;
-            _context = new DbTopicTrennerContext();
-        }
-
-        private void OnStopApplication()
-        {
-            _active = false;
-            _context = null;
-            Console.WriteLine("LogServiceInDbContext finished: OnStopApplication");
+            //_context.Logs.Add(l);
+            //_context.SaveChanges();
         }
     }
 }
