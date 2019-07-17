@@ -13,6 +13,7 @@ namespace TopicTrennerAPI.Models
         public DateTime DateCreated { get; set; } 
         public List<SessionRun> SessionRuns { get; set; }
         public List<SimpleRule> SimpleRules { get; set; }
+        public List<EventMessage> Events { get; set; }
 
         public bool IsActive()
         {

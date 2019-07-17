@@ -32,6 +32,7 @@ namespace TopicTrennerAPI.Data
         public DbSet<TimeDiff> TimeDiffs { get; set; }
         public DbSet<PurposeMessage> PurposeMessages { get; set; }
         public DbSet<Log> Logs { get; set; }
+        public DbSet<EventMessage> Events { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -43,6 +44,7 @@ namespace TopicTrennerAPI.Data
             modelBuilder.Entity<TimeDiff>().ToTable("TimeDiff");
             modelBuilder.Entity<PurposeMessage>().ToTable("PurposeMessage");
             modelBuilder.Entity<Log>().ToTable("Log");
+            modelBuilder.Entity<EventMessage>().ToTable("Event");
         }
     }
 }
