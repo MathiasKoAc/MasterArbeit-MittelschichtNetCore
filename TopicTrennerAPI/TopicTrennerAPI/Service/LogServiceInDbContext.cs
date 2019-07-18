@@ -65,7 +65,6 @@ namespace TopicTrennerAPI.Service
             l.Topic = topic;
             l.SessionRunID = _sessionRunId;
 
-            //TODO Problem beheben hier kann ich nicht auf die Datenbank zugreifen!
             _context.Logs.Add(l);
             _context.SaveChanges();
         }

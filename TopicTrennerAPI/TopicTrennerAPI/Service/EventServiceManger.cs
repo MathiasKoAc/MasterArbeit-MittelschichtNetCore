@@ -23,7 +23,7 @@ namespace TopicTrennerAPI.Service
         public void StartEventService(int sessionRunId)
         {
             SessionRun session = _dbContext.SessionRuns.Where(s => s.ID == sessionRunId).First();
-            List <EventMessage> events = _dbContext.Events.Where(e => e.SessionId == session.SessionID && e.ActivTyp != EnumActivityTyp.deactiv).ToList();
+            List <EventMessage> events = _dbContext.Events.Where(e => e.SessionId == session.SessionID && e.Enabled).ToList();
 
             _eventService.SetAllEvents(events);
             _eventService.SetEventServiceActive(true, sessionRunId);

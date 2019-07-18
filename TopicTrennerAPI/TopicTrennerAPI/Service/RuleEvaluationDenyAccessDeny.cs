@@ -236,7 +236,7 @@ namespace TopicTrennerAPI.Service
                 if(multiLevelWildModus)
                 {
                     for(;i < topicPartsMessageIn.Count(); i++) {
-                        // TODO go over the MessageParts and replace the #
+                        //go over the MessageParts and replace the #
                         topicBuild.Append("/");
                         topicBuild.Append(topicPartsMessageIn[i]);
                     }
