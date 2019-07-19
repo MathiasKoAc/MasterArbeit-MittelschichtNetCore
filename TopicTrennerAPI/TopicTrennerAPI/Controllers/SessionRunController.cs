@@ -18,13 +18,17 @@ namespace TopicTrennerAPI.Controllers
         readonly IManageRuleService _manageRuleSevice;
         readonly IManageTimeService _manageTimeSevice;
         readonly IManageLogService _manageLogService;
+        readonly IManageEventService _manageEventService;
 
-        public SessionRunController(DbTopicTrennerContext context, IManageRuleService ctrlRuleSession, IManageTimeService controlTimeSession, IManageLogService logService)
+        public SessionRunController(DbTopicTrennerContext context, IManageRuleService ctrlRuleSession,
+                                    IManageTimeService controlTimeSession, IManageLogService logService,
+                                    IManageEventService eventService)
         {
             _context = context;
             _manageRuleSevice = ctrlRuleSession;
             _manageTimeSevice = controlTimeSession;
             _manageLogService = logService;
+            _manageEventService = eventService;
         }
 
         // GET: api/SessionRun
@@ -146,6 +150,7 @@ namespace TopicTrennerAPI.Controllers
             _manageRuleSevice.StartRuleSession(id);
             _manageTimeSevice.StartTimeService(id);
             _manageLogService.StartLogService(id);
+            _manageEventService.StartEventService(id);
         }
 
         private void StopSessionRun(int id)
@@ -153,6 +158,7 @@ namespace TopicTrennerAPI.Controllers
             _manageRuleSevice.StopRuleSession(id);
             _manageTimeSevice.StopTimeService(id);
             _manageLogService.StopLogService(id);
+            _manageEventService.StopEventService(id);
         }
 
         private void SetAllInactiveActive()
