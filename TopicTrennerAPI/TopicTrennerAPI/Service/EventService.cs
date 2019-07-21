@@ -69,13 +69,13 @@ namespace TopicTrennerAPI.Service
 
                 if (em.Activ)
                 {
-                    if(em.ZeitAbstand == TimeSpan.MinValue)
+                    if(em.ZeitAbstand == TimeSpan.Zero)
                     {
                         AddTopicBasedEvent(em);
                     }
                     else
                     {
-                        timedEvents.Add((TimedEventMessage)em);
+                        timedEvents.Add(new TimedEventMessage(em));
                     }
                 }
             }
@@ -103,7 +103,7 @@ namespace TopicTrennerAPI.Service
             //Service ist nicht activ und sessionRunId wir übermittelt
             if(!_active && sessionRunId != -1)
             {
-                sessionRunId 
+                _sessionRunId = sessionRunId;
                 _active = active;
                 return true;
             }
@@ -128,7 +128,7 @@ namespace TopicTrennerAPI.Service
             {
                 loopNow = DateTime.Now + _timeSpanDiff;
                 ActivateDeactivateEventsByTime(loopNow, loopLast);
-                FireEventsByTime(loopNow, loopLast);
+                FireEventsByTime(loopNow);
                 loopLast = loopNow;
                 Thread.Sleep(1000 * waitSecInTimeLoop);
             }
@@ -209,7 +209,7 @@ namespace TopicTrennerAPI.Service
             }
         }
 
-        private void FireEventsByTime(DateTime timeNow, DateTime timeLast)
+        private void FireEventsByTime(DateTime timeNow)
         {
             foreach(TimedEventMessage tm in activTimedEvents)
             {
@@ -229,16 +229,17 @@ namespace TopicTrennerAPI.Service
 
         public void OnReceivedMessage(string topic, byte[] message)
         {
-            Task.Run(()=>FireTopicBasedEventsForTopic(topic));
+            Task.Run(()=>FireTopicBasedEventsForTopic(topic, message));
         }
 
-        private void FireTopicBasedEventsForTopic(string topic)
+        private void FireTopicBasedEventsForTopic(string topic, byte[] message)
         {
+            string strMessage = System.Text.Encoding.UTF8.GetString(message);
             if (activTopicBasedEvents.TryGetValue(topic, out HashSet<EventMessage> elist))
             {
                 foreach (EventMessage em in elist)
                 {
-                    if (em.Activ)
+                    if (em.Activ && em.Message != strMessage)
                     {
                         FireOnceEvent(em);
                     }

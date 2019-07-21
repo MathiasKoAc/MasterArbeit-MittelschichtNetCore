@@ -36,6 +36,7 @@ namespace TopicTrennerAPI
             services.AddScoped<IManageLogService, LogServiceManager>();
             services.AddSingleton<IServeEvents, EventService>();
             services.AddScoped<IManageEventService, EventServiceManger>();
+            services.AddScoped<IFindSessionRun, ActivSessionRun>();
 
         }
 
