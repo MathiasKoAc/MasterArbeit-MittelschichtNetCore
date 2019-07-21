@@ -42,7 +42,9 @@ namespace TopicTrennerAPI.Service
                 return;
             }
 
-            string[] topicParts = topic.Trim().ToLower().Split("/");
+            string cleanedTopic = topic.Trim().ToLower();
+            cleanedTopic = cleanedTopic.StartsWith('/') ? cleanedTopic.Substring(1) : cleanedTopic;
+            string[] topicParts = cleanedTopic.Split("/");
 
             if (CheckDeny(topicParts, TopicRulesDenyIn))
             {
