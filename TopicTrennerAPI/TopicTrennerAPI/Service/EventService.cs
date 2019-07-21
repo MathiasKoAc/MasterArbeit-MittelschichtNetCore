@@ -255,8 +255,10 @@ namespace TopicTrennerAPI.Service
                 {
                     list = new HashSet<EventMessage>();
                 }
-                list.Add(em);
-                activTopicBasedEvents.Add(em.Topic, list);
+                if(!list.TryGetValue(em, out EventMessage em2))
+                {
+                    list.Add(em);
+                }
             }
             else
             {

@@ -6,6 +6,7 @@ using TopicTrennerAPI.Models;
 using TopicTrennerAPI.Data;
 using TopicTrennerAPI.Interfaces;
 using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
 
 namespace TopicTrennerAPI.Service
 {
@@ -50,8 +51,6 @@ namespace TopicTrennerAPI.Service
             }
             
         }
-
-
 
         public void OnReceivedMessage(string topic, byte[] message)
         {

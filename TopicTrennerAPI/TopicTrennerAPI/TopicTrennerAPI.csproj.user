@@ -10,6 +10,6 @@
     <WebStackScaffolding_LayoutPageFile />
     <WebStackScaffolding_IsAsyncSelected>False</WebStackScaffolding_IsAsyncSelected>
     <WebStackScaffolding_DbContextTypeFullName>TopicTrennerAPI.Data.DbTopicTrennerContext</WebStackScaffolding_DbContextTypeFullName>
-    <NameOfLastUsedPublishProfile>pulish-lin</NameOfLastUsedPublishProfile>
+    <NameOfLastUsedPublishProfile>publish-win</NameOfLastUsedPublishProfile>
   </PropertyGroup>
 </Project>
