@@ -8,15 +8,17 @@ namespace TopicTrennerAPI.Service
 {
     public class RuleServiceManager : IManageRuleService
     {
-        readonly ICreateTopicRulesFromSimpleRules topicRuleCreater;
+        readonly ICreateTopicVertexFromTopics topicRuleCreater;
         readonly DbTopicTrennerContext dbContext;
         readonly IServeRuleEvaluation ruleEvaluation;
+        readonly IAlgoRuleFactory algoRuleFactory;
 
-        public RuleServiceManager(ICreateTopicRulesFromSimpleRules ruleCreater, DbTopicTrennerContext dbContexT, IServeRuleEvaluation setupEvaluationRules)
+        public RuleServiceManager(ICreateTopicVertexFromTopics ruleCreater, DbTopicTrennerContext dbContexT, IServeRuleEvaluation setupEvaluationRules)
         {
             topicRuleCreater = ruleCreater;
             dbContext = dbContexT;
             ruleEvaluation = setupEvaluationRules;
+            algoRuleFactory = new AlgoRuleFactory();
         }
 
         public void StartRuleSession(int sessionRunId)
@@ -46,14 +48,21 @@ namespace TopicTrennerAPI.Service
 
             var sessionId = dbContext.SessionRuns.Where(s => s.ID == sessionRunId).First().SessionID;
 
-            topicRuleCreater.CreateTopicRulesFromSimpleRules(ref topicRules, ReadToSimpleRuleList(sessionId, ruleTyp));
+            topicRuleCreater.CreateTopicVertexFromTopics(ref topicRules, ReadToSimpleRuleList(sessionId, ruleTyp), algoRuleFactory);
             return topicRules;
         }
 
-        private List<SimpleRule> ReadToSimpleRuleList(int sessionId, EnumSimpleRuleTyp ruleTyp = EnumSimpleRuleTyp.access)
+        private List<ISimpleRule> ReadToSimpleRuleList(int sessionId, EnumSimpleRuleTyp ruleTyp = EnumSimpleRuleTyp.access)
         {
             var rules = dbContext.Rules.Where(r => r.SessionID == sessionId && r.SimpleRuleTyp.Equals(ruleTyp) && r.Active == true);
-            return rules.ToList();
+
+            List<SimpleRule> ruleList = rules.ToList();
+            List<ISimpleRule> iSimple = new List<ISimpleRule>();
+            foreach(SimpleRule r in ruleList)
+            {
+                iSimple.Add(r);
+            }
+            return iSimple;
         }
     }
 }

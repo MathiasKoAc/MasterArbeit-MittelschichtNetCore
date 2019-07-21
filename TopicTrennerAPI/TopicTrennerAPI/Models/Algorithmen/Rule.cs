@@ -1,16 +1,14 @@
-﻿
+﻿using TopicTrennerAPI.Interfaces;
+
 namespace TopicTrennerAPI.Models
 {
-    public class Rule
+    public class Rule : IAlgoRule
     {
         private string _outTopic;
         private string[] _outTopicParts = null;
-        private bool _outTopicHasWildcard = false;
-
         public TopicVertex InTopic { get; set; }
-        
         public bool Active { get; set; }
-        public bool OutTopicHasWildcard { get { return _outTopicHasWildcard; } }
+        public bool OutTopicHasWildcard { get; private set; } = false;
 
         public string OutTopic
         {
@@ -20,13 +18,9 @@ namespace TopicTrennerAPI.Models
                 _outTopic = value;
                 if(_outTopic.Contains('#') || _outTopic.Contains('+')) {
                     _outTopicParts = _outTopic.Split('/');
-                    this._outTopicHasWildcard = true;
+                    this.OutTopicHasWildcard = true;
                 }
             }
-        }
-
-        public Rule()
-        {
         }
 
         public Rule(TopicVertex inTopic, string outTopic, bool active)
@@ -36,13 +30,6 @@ namespace TopicTrennerAPI.Models
             Active = active;
         }
 
-        public Rule(TopicVertex inTopic, SimpleRule simpleRule)
-        {
-            InTopic = inTopic;
-            OutTopic = simpleRule.OutTopic;
-            Active = simpleRule.Active;
-        }
-
         public string[] GetOutTopicParts()
         {
             if(_outTopicParts == null)
@@ -50,6 +37,28 @@ namespace TopicTrennerAPI.Models
                 _outTopicParts = _outTopic.Split('/');
             }
             return _outTopicParts;
+        }
+
+        public void Setup(TopicVertex startVertex, string outTopic, bool active)
+        {
+            this.InTopic = startVertex;
+            this.OutTopic = OutTopic;
+            this.Active = active;
+        }
+
+        public void SetStartVertex(TopicVertex vertex)
+        {
+            this.InTopic = vertex;
+        }
+
+        public void SetOutTopic(string topic)
+        {
+            this.OutTopic = topic;
+        }
+
+        public void SetActiv(bool active)
+        {
+            this.Active = active;
         }
     }
 }

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using TopicTrennerAPI.Interfaces;
 
 namespace TopicTrennerAPI.Models
 {
@@ -9,7 +7,7 @@ namespace TopicTrennerAPI.Models
     /// Events sind Sinmulations Happenings die Werte auf MQTT setzen.
     /// Events koennen per Hand oder Automatisch getriggert werden.
     /// </summary>
-    public class EventMessage : MqttMessage
+    public class EventMessage : MqttMessage, ISimpleRule
     {
         public int ID { get; set; }
         public bool FireOnce { get; set; }
@@ -32,5 +30,21 @@ namespace TopicTrennerAPI.Models
         /// </summary>
         public bool Automatic { get; set; }
 
+
+
+        public string GetInTopic()
+        {
+            return Topic;
+        }
+
+        public string GetOutTopic()
+        {
+            return Topic;
+        }
+
+        public bool IsActive()
+        {
+            return Activ;
+        }
     }
 }

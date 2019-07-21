@@ -28,7 +28,7 @@ namespace TopicTrennerAPI
             services.AddTransient<IServerConfig, ServerConfigConnectionString>();
             services.AddSingleton<IMqttConnector, MqttConnectAll>();
             services.AddSingleton<IServeRuleEvaluation, RuleEvaluationDenyAccessDeny>();
-            services.AddTransient<ICreateTopicRulesFromSimpleRules, TopicRuleFactory>();
+            services.AddTransient<ICreateTopicVertexFromTopics, TopicVertexFactory>();
             services.AddScoped<IManageRuleService, RuleServiceManager>();
             services.AddSingleton<IServeTime, MqttTimeService>();
             services.AddScoped<IManageTimeService, TimeServiceManager>();

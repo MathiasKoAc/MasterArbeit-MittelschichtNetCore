@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using TopicTrennerAPI.Interfaces;
 
 namespace TopicTrennerAPI.Models
 {
@@ -8,12 +9,12 @@ namespace TopicTrennerAPI.Models
         public TopicVertex ParentVertex { get; set; }
         List<TopicVertex> ChildVertexes;
         public string TopicPart { get; set; }    //topicPart
-        public List<Rule> Rules { get; set; }
+        public List<IAlgoRule> AlgoRule { get; set; }
 
         public TopicVertex()
         {
             this.ChildVertexes = new List<TopicVertex>();
-            this.Rules = new List<Rule>();
+            this.AlgoRule = new List<IAlgoRule>();
         }
 
         public TopicVertex(TopicVertex parenVertex, string topicPart) : this()

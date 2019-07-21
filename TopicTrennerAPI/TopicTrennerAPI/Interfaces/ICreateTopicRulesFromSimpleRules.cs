@@ -4,9 +4,9 @@ using TopicTrennerAPI.Models;
 
 namespace TopicTrennerAPI.Interfaces
 {
-    public interface ICreateTopicRulesFromSimpleRules
+    public interface ICreateTopicVertexFromTopics
     {
-        void CreateTopicRulesFromSimpleRule(ref Dictionary<string, TopicVertex> topicRules, SimpleRule simpleRule);
-        void CreateTopicRulesFromSimpleRules(ref Dictionary<string, TopicVertex> topicRules, List<SimpleRule> simpleRules);
+        void CreateTopicVertexFromTopic(ref Dictionary<string, TopicVertex> topicRules, ISimpleRule simpleRule, IAlgoRuleFactory ruleFactory);
+        void CreateTopicVertexFromTopics(ref Dictionary<string, TopicVertex> topicRules, List<ISimpleRule> simpleRules, IAlgoRuleFactory ruleFactory);
     }
 }
