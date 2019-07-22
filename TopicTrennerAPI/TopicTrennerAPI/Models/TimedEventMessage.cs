@@ -2,7 +2,7 @@
 
 namespace TopicTrennerAPI.Models
 {
-    public class TimedEventMessage : EventMessage
+    public class TimedEventMessage : EventMessage, IEquatable<TimedEventMessage>, IComparable<TimedEventMessage>
     {
         public DateTime LastFired { get; set; }
 
@@ -23,6 +23,24 @@ namespace TopicTrennerAPI.Models
             this.ZeitAbstand = em.ZeitAbstand;
 
             this.LastFired = DateTime.MinValue;
+        }
+
+        public bool Equals(TimedEventMessage other)
+        {
+            if (other.ID == this.ID)
+            {
+                return true;
+            }
+            else if (other.ID <= 0 || this.ID <= 0)
+            {
+                return SessionId == other.SessionId && Topic == other.Topic && VonDate == other.VonDate && BisDate == other.BisDate && ZeitAbstand == other.ZeitAbstand;
+            }
+            return false;
+        }
+
+        public int CompareTo(TimedEventMessage other)
+        {
+            return this.ID - other.ID;
         }
     }
 }

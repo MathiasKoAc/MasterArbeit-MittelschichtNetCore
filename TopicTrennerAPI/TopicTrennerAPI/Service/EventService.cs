@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using TopicTrennerAPI.Interfaces;
 using TopicTrennerAPI.Models;
+using TopicTrennerAPI.Lib;
 
 namespace TopicTrennerAPI.Service
 {
@@ -21,16 +22,18 @@ namespace TopicTrennerAPI.Service
         private HashSet<TimedEventMessage> activTimedEvents;
         private Dictionary<string, HashSet<EventMessage>> activTopicBasedEvents;
 
+        private Task taskEventLoop;
+
         public EventService(IMqttConnector mqttConnector, IApplicationLifetime applicationLifttime, IConfiguration config)
         {
             automaticEventStarts = new HashSet<EventMessage>();
-            activTimedEvents = new HashSet<TimedEventMessage>();
+            activTimedEvents = new HashSet<TimedEventMessage>(new TimedEventComparer());
             activTopicBasedEvents = new Dictionary<string, HashSet<EventMessage>>();
 
             _mqttCon = mqttConnector;
             _mqttCon.AddTopicReceiver("#", this);
             applicationLifttime.ApplicationStopping.Register(OnStopApplication);
-            StartEventLoop();
+            TryStartEventLoop();
             waitSecInTimeLoop = config.GetValue<int>("WaitSecondsInEventLoop");
         }
 
@@ -53,9 +56,10 @@ namespace TopicTrennerAPI.Service
         {
             //so weit DoublePuffer
             HashSet<EventMessage> autoEvents = new HashSet<EventMessage>();
-            HashSet<TimedEventMessage> timedEvents = new HashSet<TimedEventMessage>();
+            HashSet<TimedEventMessage> timedEvents = new HashSet<TimedEventMessage>(new TimedEventComparer());
+            activTopicBasedEvents = new Dictionary<string, HashSet<EventMessage>>();
 
-            foreach(EventMessage em in eventMessages)
+            foreach (EventMessage em in eventMessages)
             {
                 if(!em.Enabled)
                 {
@@ -90,13 +94,14 @@ namespace TopicTrennerAPI.Service
             if (sessionRunId == -1 && _sessionRunId != int.MinValue)
             {
                 _active = active;
+                TryStartEventLoop();
                 return true;
             }
 
-            //Service ist active und nun wird der status geändert
+            //Service ist active und bleibt
             if (_active && sessionRunId == _sessionRunId)
             {
-                _active = active;
+                TryStartEventLoop();
                 return true;
             }
 
@@ -105,6 +110,7 @@ namespace TopicTrennerAPI.Service
             {
                 _sessionRunId = sessionRunId;
                 _active = active;
+                TryStartEventLoop();
                 return true;
             }
             return false;
@@ -115,9 +121,12 @@ namespace TopicTrennerAPI.Service
             _timeSpanDiff = timeSpan;
         }
 
-        private void StartEventLoop()
+        private void TryStartEventLoop()
         {
-            Task.Run(EventLoop);
+            if(taskEventLoop == null || taskEventLoop.Status != TaskStatus.Running)
+            {
+                this.taskEventLoop = Task.Run(EventLoop);
+            }
         }
 
         private void EventLoop()
@@ -132,17 +141,21 @@ namespace TopicTrennerAPI.Service
                 loopLast = loopNow;
                 Thread.Sleep(1000 * waitSecInTimeLoop);
             }
+            Console.WriteLine("EventLoop Stopped");
         }
 
         private void ActivateDeactivateEventsByTime(DateTime timeNow, DateTime timeLast)
         {
+            HashSet<EventMessage> emToDel = new HashSet<EventMessage>();
+
             foreach(EventMessage em in automaticEventStarts)
             {
                 //Fall1
                 if(timeLast < em.VonDate && timeNow > em.BisDate)
                 {
                     FireOnceEvent(em);
-                    automaticEventStarts.Remove(em);
+                    //automaticEventStarts.Remove(em);
+                    emToDel.Add(em);
                     RemoveTopicBasedEvent(em);
                 }
                 else 
@@ -162,8 +175,9 @@ namespace TopicTrennerAPI.Service
                 if(timeLast > em.VonDate && timeNow > em.BisDate)
                 {
                     em.Activ = false;
-                    activTimedEvents.Remove((TimedEventMessage)em);
-                    automaticEventStarts.Remove(em);
+                    activTimedEvents.Remove(new TimedEventMessage(em));
+                    //automaticEventStarts.Remove(em);
+                    emToDel.Add(em);
                     RemoveTopicBasedEvent(em);
                 }
                 else
@@ -177,16 +191,20 @@ namespace TopicTrennerAPI.Service
                 if(timeLast > em.BisDate)
                 {
                     em.Activ = false;
-                    activTimedEvents.Remove((TimedEventMessage)em);
-                    automaticEventStarts.Remove(em);
+                    activTimedEvents.Remove(new TimedEventMessage(em));
+                    //automaticEventStarts.Remove(em);
                     RemoveTopicBasedEvent(em);
                 }
+            }
+
+            foreach(EventMessage em in emToDel)
+            {
+                automaticEventStarts.Remove(em);
             }
         }
 
         private void SetEventActiveOrFireOnce(EventMessage em)
         {
-            FireOnceEvent(em);
             DateTime timeFired = DateTime.Now + _timeSpanDiff;
 
             if (!em.FireOnce)
@@ -194,18 +212,29 @@ namespace TopicTrennerAPI.Service
                 em.Activ = true;
 
                 //if ZeitAbstand 0000 dann kontinuierliches Update
-                if(em.ZeitAbstand == TimeSpan.MinValue)
+                if(em.ZeitAbstand == TimeSpan.Zero)
                 {
                     //uber mqtt topics getimed
-                    AddTopicBasedEvent(em);
+                    bool add = AddTopicBasedEvent(em);
+                    if(add)
+                    {
+                        FireOnceEvent(em);
+                    }
                 }
                 else
                 {
                     //normal im Loop getimed
-                    TimedEventMessage tm = (TimedEventMessage)em;
+                    TimedEventMessage tm = new TimedEventMessage(em);
                     tm.LastFired = timeFired;
-                    activTimedEvents.Add(tm);
+                    if (!activTimedEvents.TryGetValue(tm, out TimedEventMessage em2))
+                    {
+                        activTimedEvents.Add(tm);
+                    }
                 }
+            }
+            else
+            {
+                FireOnceEvent(em);
             }
         }
 
@@ -213,7 +242,7 @@ namespace TopicTrennerAPI.Service
         {
             foreach(TimedEventMessage tm in activTimedEvents)
             {
-                if(tm.LastFired < timeNow)
+                if(tm.LastFired+tm.ZeitAbstand <= timeNow)
                 {
                     tm.LastFired = timeNow;
                     FireOnceEvent(tm);
@@ -247,7 +276,7 @@ namespace TopicTrennerAPI.Service
             }
         }
 
-        private void AddTopicBasedEvent(EventMessage em)
+        private bool AddTopicBasedEvent(EventMessage em)
         {
             if (activTopicBasedEvents.TryGetValue(em.Topic, out HashSet<EventMessage> list))
             {
@@ -257,15 +286,17 @@ namespace TopicTrennerAPI.Service
                 }
                 if(!list.TryGetValue(em, out EventMessage em2))
                 {
-                    list.Add(em);
+                    return list.Add(em);
                 }
             }
             else
             {
                 list = new HashSet<EventMessage>();
-                list.Add(em);
+                bool done = list.Add(em);
                 activTopicBasedEvents.Add(em.Topic, list);
+                return done;
             }
+            return false;
         }
 
         private void RemoveTopicBasedEvent(EventMessage em)
