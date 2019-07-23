@@ -51,6 +51,10 @@ namespace TopicTrennerAPI.Controllers
                 return BadRequest();
             }
 
+            if(sSession.DateCreated == DateTime.MinValue)
+            {
+                sSession.DateCreated = DateTime.Now;
+            }
             _context.Sessions.Add(sSession);
             _context.SaveChanges();
 

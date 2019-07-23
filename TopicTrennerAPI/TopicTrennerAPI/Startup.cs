@@ -33,7 +33,9 @@ namespace TopicTrennerAPI
                                     "http://localhost:63342",
                                     "https://localhost:63342",
                                     "http://localhost:8000",
-                                    "https://localhost:8000");
+                                    "https://localhost:8000")
+                    .AllowAnyHeader().
+                    AllowAnyMethod();
                 });
             });
 
