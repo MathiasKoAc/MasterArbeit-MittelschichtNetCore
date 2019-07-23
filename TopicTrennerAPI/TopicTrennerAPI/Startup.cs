@@ -17,11 +17,26 @@ namespace TopicTrennerAPI
             Configuration = configuration;
         }
 
+        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy(MyAllowSpecificOrigins, builder =>
+                {
+                    builder.WithOrigins("http://localhost",
+                                    "https://localhost",
+                                    "http://localhost:63342",
+                                    "https://localhost:63342",
+                                    "http://localhost:8000",
+                                    "https://localhost:8000");
+                });
+            });
+
             this.SetupDbCorrect(Configuration.GetConnectionString("DbDefaultConnection"));
             services.AddDbContext<DbTopicTrennerContext>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
@@ -51,7 +66,7 @@ namespace TopicTrennerAPI
             {
                 app.UseHsts();
             }
-
+            app.UseCors(MyAllowSpecificOrigins);
             app.UseHttpsRedirection();
             app.UseMvc();
         }
