@@ -92,9 +92,12 @@ namespace TopicTrennerAPI.Controllers
             {
                 return NotFound();
             }
-
-            var oldSessionR = _context.SessionRuns.Find(id);
-
+            /*
+            if (_context.SessionRuns.Find(id) == null)
+            {
+                return NotFound();
+            }
+            */
             if (sessionR.Active)
             {
                 SetAllInactiveActive();
@@ -105,11 +108,7 @@ namespace TopicTrennerAPI.Controllers
                 StopSessionRun(sessionR.ID);
             }
 
-            oldSessionR.Active = sessionR.Active;
-            if(sessionR.StopTime != null)
-            {
-                oldSessionR.StopTime = sessionR.StopTime;
-            }
+            _context.Entry(sessionR).State = EntityState.Modified;
             _context.SaveChanges();
             return NoContent();
         }
@@ -133,16 +132,11 @@ namespace TopicTrennerAPI.Controllers
                     StopSessionRun(sessionR.ID);
                 }
                 
-                sessionR.Active = false;
-                if(sessionR.StopTime == null)
-                {
-                    sessionR.StopTime = DateTime.Now;
-                }
-                _context.Entry(sessionR).State = EntityState.Modified;
+                _context.SessionRuns.Remove(sessionR);
                 _context.SaveChanges();
             }
 
-            return null;
+            return NoContent();
         }
 
         private void StartSessionRun(int id)

@@ -18,6 +18,7 @@ namespace TopicTrennerAPI
         }
 
         readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+        readonly string MyAllowAll = "_myAllowAll";
 
         public IConfiguration Configuration { get; }
 
@@ -26,16 +27,25 @@ namespace TopicTrennerAPI
         {
             services.AddCors(options =>
             {
+                //Alle durchlassen
+                options.AddPolicy(MyAllowAll, builder =>
+                {
+                    builder.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+                });
+
+                //Nur Spezielle durchlassen
                 options.AddPolicy(MyAllowSpecificOrigins, builder =>
                 {
                     builder.WithOrigins("http://localhost",
-                                    "https://localhost",
-                                    "http://localhost:63342",
-                                    "https://localhost:63342",
-                                    "http://localhost:8000",
-                                    "https://localhost:8000")
-                    .AllowAnyHeader().
-                    AllowAnyMethod();
+                        "https://localhost",
+                        "http://localhost:63342",
+                        "https://localhost:63342",
+                        "http://localhost:8000",
+                        "https://localhost:8000")
+                        .AllowAnyHeader().
+                        AllowAnyMethod();
                 });
             });
 
@@ -60,6 +70,7 @@ namespace TopicTrennerAPI
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseCors(MyAllowAll);
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -68,7 +79,6 @@ namespace TopicTrennerAPI
             {
                 app.UseHsts();
             }
-            app.UseCors(MyAllowSpecificOrigins);
             app.UseHttpsRedirection();
             app.UseMvc();
         }
