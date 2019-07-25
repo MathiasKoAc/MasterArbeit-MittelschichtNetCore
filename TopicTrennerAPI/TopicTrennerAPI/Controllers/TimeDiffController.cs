@@ -66,19 +66,24 @@ namespace TopicTrennerAPI.Controllers
             {
                 return BadRequest();
             }
-            var dbDiff = _context.TimeDiffs.Find(id);
 
-            if (_context.SessionRuns.Where(s => s.ID == id).First().Active)
+            var dbDiff = _context.TimeDiffs.Find(id);
+            if(dbDiff == null)
             {
-                if(dbDiff.Diff > sTimeDiff.Diff)
+                _context.TimeDiffs.Add(sTimeDiff);
+            }
+            else
+            {
+                if (_context.SessionRuns.Where(s => s.ID == id).First().Active 
+                    && (dbDiff.Diff > sTimeDiff.Diff))
                 {
                     // if the Session is Active Time shift in the past is not alowed
                     return BadRequest();
                 }
+                dbDiff.Diff = sTimeDiff.Diff;
+                _context.Entry(dbDiff).State = EntityState.Modified;
             }
-
-            dbDiff.Diff = sTimeDiff.Diff;
-            _context.Entry(dbDiff).State = EntityState.Modified;
+            
             _context.SaveChanges();
             _ctrlTimeSession.ReloadTimeService(sTimeDiff.ID);
             return NoContent();

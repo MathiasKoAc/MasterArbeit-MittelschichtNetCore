@@ -86,8 +86,17 @@ namespace TopicTrennerAPI
         private void SetupDbCorrect(string config)
         {
             DbTopicTrennerContext.DbConfigString = config;
-            var context = new DbTopicTrennerContext();
-            context.Database.EnsureCreated();
+            DbTopicTrennerContext context = new DbTopicTrennerContext();
+
+            if (context != null)
+            {
+                context.Database.EnsureCreated();
+            }
+            else
+            {
+                throw new Exception("No Connection to SQL-Server");
+            }
+            
         }
     }
 }
