@@ -52,8 +52,7 @@ namespace TopicTrennerAPI.Controllers
             }
 
             _context.Subjects.Add(sSubject);
-            _context.SaveChangesAsync();
-
+            _context.SaveChanges();
             return NoContent();
         }
 
