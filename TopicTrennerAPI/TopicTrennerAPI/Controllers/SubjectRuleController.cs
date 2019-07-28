@@ -12,16 +12,15 @@ namespace TopicTrennerAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SimpleRuleSubjectController : ControllerBase
+    public class SubjectRuleController : ControllerBase
     {
         readonly DbTopicTrennerContext _context;
 
-        public SimpleRuleSubjectController(DbTopicTrennerContext context)
+        public SubjectRuleController(DbTopicTrennerContext context)
         {
             _context = context;
         }
 
-        // GET: api/SimpleRuleSubject
         [HttpGet]
         public ActionResult<IEnumerable<SimpleRuleSubject>> Get()
         {
@@ -29,7 +28,6 @@ namespace TopicTrennerAPI.Controllers
             return sub;
         }
 
-        // GET: api/SimpleRuleSubject/5
         [HttpGet("{id}")]
         public async Task<ActionResult<SimpleRuleSubject>> Get(int id)
         {
@@ -42,7 +40,6 @@ namespace TopicTrennerAPI.Controllers
             return null;
         }
 
-        // POST: api/SimpleRuleSubject
         [HttpPost]
         public IActionResult Post(SimpleRuleSubject sSimpleRuleSubject)
         {
@@ -57,7 +54,6 @@ namespace TopicTrennerAPI.Controllers
             return NoContent();
         }
 
-        // PUT: api/SimpleRuleSubject/5
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, SimpleRuleSubject sSimpleRuleSubject)
         {
@@ -71,7 +67,6 @@ namespace TopicTrennerAPI.Controllers
             return NoContent();
         }
 
-        // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

@@ -29,60 +29,17 @@ namespace TopicTrennerAPI.Controllers
             return sub;
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Log>> Get(int id)
+        [HttpGet("{sessionRunId}")]
+        public ActionResult<IEnumerable<Log>> Get(int sessionRunId)
         {
             if (_context.Logs.Count() > 0)
             {
-                var Log = await _context.Logs.FindAsync(id);
+                var Log = _context.Logs.Where(l => l.SessionRunID == sessionRunId).OrderByDescending(l => l.ID).ToList();
                 return Log;
             }
 
             return null;
         }
 
-        // POST: api/Session
-        [HttpPost]
-        public IActionResult Post(Log l)
-        {
-            if(l.ID != 0 && _context.Logs.Find(l.ID) != null)
-            {
-                return BadRequest();
-            }
-
-            _context.Logs.Add(l);
-            _context.SaveChanges();
-
-            return NoContent();
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, Log l)
-        {
-            if(id != l.ID)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(l).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-            return NoContent();
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var l = await _context.Logs.FindAsync(id);
-
-            if (l == null)
-            {
-                return NotFound();
-            }
-
-            _context.Logs.Remove(l);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
     }
 }

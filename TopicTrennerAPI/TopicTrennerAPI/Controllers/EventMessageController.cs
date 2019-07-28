@@ -95,10 +95,13 @@ namespace TopicTrennerAPI.Controllers
 
         private void ReloadEventService(int SessionId)
         {
-            SessionRun sesRun = _context.SessionRuns.Where(s => s.Session.ID == SessionId).First();
-            if (sesRun != null && sesRun.Active)
-            {
-                _eventManager.ReloadEventService(sesRun.ID);
+            var query = _context.SessionRuns.Where(s => s.SessionID == SessionId);
+            if(query.Count() > 0) {
+                SessionRun sesRun = query.First();
+                if (sesRun != null && sesRun.Active)
+                {
+                    _eventManager.ReloadEventService(sesRun.ID);
+                }
             }
         }
     }

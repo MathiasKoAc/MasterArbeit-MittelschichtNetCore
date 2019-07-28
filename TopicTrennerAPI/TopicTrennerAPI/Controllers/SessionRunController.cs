@@ -92,24 +92,39 @@ namespace TopicTrennerAPI.Controllers
             {
                 return NotFound();
             }
-            /*
-            if (_context.SessionRuns.Find(id) == null)
-            {
-                return NotFound();
-            }
-            */
+
             if (sessionR.Active)
             {
-                SetAllInactiveActive();
+                var runs = _context.SessionRuns;
+                foreach (SessionRun r in runs)
+                {
+                    if (r.Active)
+                    {
+                        r.Active = false;
+                        StopSessionRun(r.ID);
+                        if (r.StopTime == null)
+                        {
+                            r.StopTime = DateTime.Now;
+                        }
+                    }
+
+                    if(r.ID == sessionR.ID)
+                    {
+                        r.Beschreibung = sessionR.Beschreibung;
+                        r.SessionID = sessionR.SessionID;
+                        r.StartTime = sessionR.StartTime;
+                        r.Active = sessionR.Active;
+                    }                        
+                }
                 StartSessionRun(sessionR.ID);
             }
-            else if(!sessionR.Active)
+            else
             {
+                _context.Entry(sessionR).State = EntityState.Modified;
                 StopSessionRun(sessionR.ID);
             }
-
-            _context.Entry(sessionR).State = EntityState.Modified;
             _context.SaveChanges();
+
             return NoContent();
         }
 
@@ -167,7 +182,6 @@ namespace TopicTrennerAPI.Controllers
                     r.StopTime = DateTime.Now;
                 }
             }
-            _context.SaveChanges();
         }
     }
 }
