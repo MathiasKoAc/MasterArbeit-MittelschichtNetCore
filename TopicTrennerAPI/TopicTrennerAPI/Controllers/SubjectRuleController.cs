@@ -24,7 +24,7 @@ namespace TopicTrennerAPI.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<SimpleRuleSubject>> Get()
         {
-            var sub = _context.SimpleRuleSubjects;
+            var sub = _context.SimpleRuleSubjects.ToList();
             return sub;
         }
 
