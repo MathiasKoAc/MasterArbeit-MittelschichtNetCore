@@ -59,7 +59,7 @@ namespace TopicTrennerAPI
             services.AddScoped<IManageRuleService, RuleServiceManager>();
             services.AddSingleton<IServeTime, MqttTimeService>();
             services.AddScoped<IManageTimeService, TimeServiceManager>();
-            services.AddSingleton<IServeLogging, LogServiceInDbContext>();
+            services.AddSingleton<IServeLogging, LogServiceInJsonFile>();
             services.AddScoped<IManageLogService, LogServiceManager>();
             services.AddSingleton<IServeEvents, EventService>();
             services.AddScoped<IManageEventService, EventServiceManger>();

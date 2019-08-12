@@ -1,13 +1,10 @@
 ﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Linq;
 using TopicTrennerAPI.Models;
-using TopicTrennerAPI.Data;
 using TopicTrennerAPI.Interfaces;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace TopicTrennerAPI.Service
 {
@@ -22,11 +19,11 @@ namespace TopicTrennerAPI.Service
 
         public LogServiceInJsonFile(IMqttConnector mqttConnector, IApplicationLifetime applicationLifttime, IConfiguration config)
         {
-            throw new NotImplementedException("Klasse nicht feritg");
+            //throw new NotImplementedException("Klasse nicht feritg");
             _mqttCon = mqttConnector;
             _config = config;
             applicationLifttime.ApplicationStopping.Register(OnStopApplication);
-            Console.WriteLine("LogServiceInDbContext Started");
+            Console.WriteLine("LogServiceInJsonFile Started");
             logPath = _config.GetConnectionString("LogFilePath");
             _mqttCon.AddTopicReceiver("#", this);
         }
@@ -36,22 +33,34 @@ namespace TopicTrennerAPI.Service
             return _active;
         }
 
-        public void SetDbContext(DbTopicTrennerContext context)
-        {
-            //_context = context;
-        }
-
         public void SetLoggingActive(int sessionRunId, bool active)
         {
+            if(_active && writer != null)
+            {
+                writer.Close();
+            }
+
             if (active)
             {
+                
                 _active = true;
                 _sessionRunId = sessionRunId;
+                try
+                {
+                    writer = File.AppendText(@logPath+"log_" + sessionRunId + ".log");
+                }
+                catch (Exception e)
+                {
+                    string s = e.ToString();
+                    writer = null;
+                }
+                
             }
             else if(_sessionRunId == sessionRunId)
             {
                 _active = false;
                 _sessionRunId = int.MinValue;
+                writer = null;
             }
             
         }
@@ -59,7 +68,7 @@ namespace TopicTrennerAPI.Service
         private void OnStopApplication()
         {
             _active = false;
-            Console.WriteLine("LogServiceInDbContext finished: OnStopApplication");
+            Console.WriteLine("LogServiceInJsonFile finished: OnStopApplication");
         }
 
         public void OnReceivedMessage(string topic, byte[] message)
@@ -68,16 +77,19 @@ namespace TopicTrennerAPI.Service
             {
                 return;
             }
+            if (writer != null)
+            {
 
-            Log l = new Log();
-            l.ID = 1;
-            l.SetMessageUft8Byte(message);
-            l.Topic = topic;
-            l.SessionRunID = _sessionRunId;
+                Log l = new Log();
+                l.ID = 1;
+                l.SetMessageUft8Byte(message);
+                l.Topic = topic;
+                l.SessionRunID = _sessionRunId;
 
-            //TODO Problem beheben hier kann ich nicht auf die Datenbank zugreifen!
-            //_context.Logs.Add(l);
-            //_context.SaveChanges();
+                JsonSerializer serializer = new JsonSerializer();
+                //serialize object directly into file stream
+                serializer.Serialize(writer, l);
+            }
         }
     }
 }

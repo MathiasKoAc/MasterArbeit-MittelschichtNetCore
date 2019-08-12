@@ -9,6 +9,9 @@ using System.Collections.Generic;
 
 namespace TopicTrennerAPI.Controllers
 {
+    /**
+     * The SubjectCmdController triggers the PurposeMessage of the Cmd and fires it by MQTT
+     */
     [Route("api/[controller]")]
     [ApiController]
     public class SubjectCmdController : ControllerBase

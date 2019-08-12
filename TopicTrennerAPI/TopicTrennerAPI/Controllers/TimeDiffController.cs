@@ -102,7 +102,7 @@ namespace TopicTrennerAPI.Controllers
 
             _context.TimeDiffs.Remove(TimeDiff);
             await _context.SaveChangesAsync();
-            _ctrlTimeSession.ReloadTimeService(TimeDiff.ID);
+            _ctrlTimeSession.ReloadTimeService(id);
 
             return NoContent();
         }

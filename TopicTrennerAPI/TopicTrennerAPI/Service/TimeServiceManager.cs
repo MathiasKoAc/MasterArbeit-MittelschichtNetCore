@@ -22,10 +22,13 @@ namespace TopicTrennerAPI.Service
 
         public void ReloadTimeService(int SessionRunId)
         {
-            var diff = _dbcontext.TimeDiffs.Where(t => t.ID == SessionRunId).First();
-            TimeSpan d = (diff == null || diff.Diff == null) ? TimeSpan.Zero : diff.Diff;
-            ReloadTimeService(SessionRunId, d);
+            var diffCall = _dbcontext.TimeDiffs.Where(t => t.ID == SessionRunId);
 
+            if(diffCall.Count() > 0) {
+                var diff = diffCall.First();
+                TimeSpan d = (diff == null || diff.Diff == null) ? TimeSpan.Zero : diff.Diff;
+                ReloadTimeService(SessionRunId, d);
+            }
         }
 
         public void ReloadTimeService(int SessionRunId, TimeSpan timeDiff)
