@@ -14,9 +14,9 @@ namespace TopicTrennerAPI.Controllers
     public class TimeDiffController : ControllerBase
     {
         readonly DbTopicTrennerContext _context;
-        readonly IControlTimeSession _ctrlTimeSession;
+        readonly IManageTimeService _ctrlTimeSession;
 
-        public TimeDiffController(DbTopicTrennerContext context, IControlTimeSession controlTimeSession)
+        public TimeDiffController(DbTopicTrennerContext context, IManageTimeService controlTimeSession)
         {
             _context = context;
             _ctrlTimeSession = controlTimeSession;
@@ -38,33 +38,54 @@ namespace TopicTrennerAPI.Controllers
                 var TimeDiff = await _context.TimeDiffs.FindAsync(id);//TodoItems.FindAsync(id);
                 return TimeDiff;
             }
-            //var td = new TimeDiff();
-            //td.ID = 1;
-            //td.Diff = 
+
             return null;
         }
 
         // POST: api/TimeDiff
         [HttpPost]
-        public void Post(TimeDiff sTimeDiff)
+        public IActionResult Post(TimeDiff sTimeDiff)
         {
+            if (sTimeDiff.ID != 0 && _context.TimeDiffs.Find(sTimeDiff.ID) != null)
+            {
+                return BadRequest();
+            }
+
             _context.TimeDiffs.Add(sTimeDiff);
             _context.SaveChanges();
-            ReloadTimeService(sTimeDiff.ID);
+            _ctrlTimeSession.ReloadTimeService(sTimeDiff.ID);
+
+            return NoContent();
         }
 
         // PUT: api/TimeDiff/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, TimeDiff sTimeDiff)
+        public IActionResult Put(int id, TimeDiff sTimeDiff)
         {
             if (id != sTimeDiff.ID)
             {
                 return BadRequest();
             }
 
-            _context.Entry(sTimeDiff).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-            ReloadTimeService(sTimeDiff.ID);
+            var dbDiff = _context.TimeDiffs.Find(id);
+            if(dbDiff == null)
+            {
+                _context.TimeDiffs.Add(sTimeDiff);
+            }
+            else
+            {
+                if (_context.SessionRuns.Where(s => s.ID == id).First().Active 
+                    && (dbDiff.Diff > sTimeDiff.Diff))
+                {
+                    // if the Session is Active Time shift in the past is not alowed
+                    return BadRequest();
+                }
+                dbDiff.Diff = sTimeDiff.Diff;
+                _context.Entry(dbDiff).State = EntityState.Modified;
+            }
+            
+            _context.SaveChanges();
+            _ctrlTimeSession.ReloadTimeService(sTimeDiff.ID);
             return NoContent();
         }
 
@@ -81,15 +102,9 @@ namespace TopicTrennerAPI.Controllers
 
             _context.TimeDiffs.Remove(TimeDiff);
             await _context.SaveChangesAsync();
-            ReloadTimeService(TimeDiff.ID);
+            _ctrlTimeSession.ReloadTimeService(id);
 
             return NoContent();
-        }
-
-        private void ReloadTimeService(int sessionRunId)
-        {
-            var sr = _context.SessionRuns.Where(s => s.ID == sessionRunId).First();
-            _ctrlTimeSession.ReloadTimeService(sr.SessionID);
         }
     }
 }

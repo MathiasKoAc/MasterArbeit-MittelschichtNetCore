@@ -141,7 +141,8 @@ namespace TopicTrennerAPI.Service
             while (isActive)
             {
                 MqttMsgPublishEventArgs mqttMessage = senderQueue.Take();
-                client.Publish(mqttMessage.Topic, mqttMessage.Message, mqttMessage.QosLevel, mqttMessage.Retain);
+                string topic = mqttMessage.Topic.StartsWith("/") ? mqttMessage.Topic.Substring(1) : mqttMessage.Topic;
+                client.Publish(topic, mqttMessage.Message, mqttMessage.QosLevel, mqttMessage.Retain);
                 Console.WriteLine(new StringBuilder("SEND# Topic: ").Append(mqttMessage.Topic));
             }
         }

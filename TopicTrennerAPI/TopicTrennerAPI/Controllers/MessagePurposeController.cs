@@ -12,31 +12,29 @@ namespace TopicTrennerAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SessionController : ControllerBase
+    public class MessagePurposeController : ControllerBase
     {
         readonly DbTopicTrennerContext _context;
 
-        public SessionController(DbTopicTrennerContext context)
+        public MessagePurposeController(DbTopicTrennerContext context)
         {
             _context = context;
         }
 
-        // GET: api/Session
         [HttpGet]
-        public ActionResult<IEnumerable<Session>> Get()
+        public ActionResult<IEnumerable<PurposeMessage>> Get()
         {
-            var sub = _context.Sessions;
+            var sub = _context.PurposeMessages;
             return sub;
         }
 
-        // GET: api/Session/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Session>> Get(int id)
+        public async Task<ActionResult<PurposeMessage>> Get(int id)
         {
-            if (_context.Sessions.Count() > 0)
+            if (_context.PurposeMessages.Count() > 0)
             {
-                var Session = await _context.Sessions.FindAsync(id);//TodoItems.FindAsync(id);
-                return Session;
+                var PurposeMessage = await _context.PurposeMessages.FindAsync(id);
+                return PurposeMessage;
             }
 
             return null;
@@ -44,49 +42,43 @@ namespace TopicTrennerAPI.Controllers
 
         // POST: api/Session
         [HttpPost]
-        public IActionResult Post(Session sSession)
+        public IActionResult Post(PurposeMessage purposeMessage)
         {
-            if (sSession.ID != 0 && _context.Sessions.Find(sSession.ID) != null)
+            if (purposeMessage.ID != 0 && _context.PurposeMessages.Find(purposeMessage.ID) != null)
             {
                 return BadRequest();
             }
 
-            if(sSession.DateCreated == DateTime.MinValue)
-            {
-                sSession.DateCreated = DateTime.Now;
-            }
-            _context.Sessions.Add(sSession);
+            _context.PurposeMessages.Add(purposeMessage);
             _context.SaveChanges();
 
             return NoContent();
         }
 
-        // PUT: api/Session/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, Session sSession)
+        public async Task<IActionResult> Put(int id, PurposeMessage purposeMessage)
         {
-            if(id != sSession.ID)
+            if(id != purposeMessage.ID)
             {
                 return BadRequest();
             }
 
-            _context.Entry(sSession).State = EntityState.Modified;
+            _context.Entry(purposeMessage).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return NoContent();
         }
 
-        // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var Session = await _context.Sessions.FindAsync(id);
+            var purposeMessage = await _context.PurposeMessages.FindAsync(id);
 
-            if (Session == null)
+            if (purposeMessage == null)
             {
                 return NotFound();
             }
 
-            _context.Sessions.Remove(Session);
+            _context.PurposeMessages.Remove(purposeMessage);
             await _context.SaveChangesAsync();
 
             return NoContent();

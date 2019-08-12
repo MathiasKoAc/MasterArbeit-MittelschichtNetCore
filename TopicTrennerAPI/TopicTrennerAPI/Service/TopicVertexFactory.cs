@@ -6,13 +6,13 @@ using System.Linq;
 
 namespace TopicTrennerAPI.Service
 {
-    public class TopicRuleFactory : ICreateTopicRulesFromSimpleRules
+    public class TopicVertexFactory : ICreateTopicVertexFromTopics
     {
-        public void CreateTopicRulesFromSimpleRule(ref Dictionary<string, TopicVertex> topicRules, SimpleRule simpleRule)
+        public void CreateTopicVertexFromTopic(ref Dictionary<string, TopicVertex> topicRules, ISimpleRule simpleRule, IAlgoRuleFactory ruleFactory)
         {
-            if (simpleRule.InTopic != null)
+            if (simpleRule.GetInTopic() != null)
             {
-                string[] inTopicParts = simpleRule.InTopic.Split("/");
+                string[] inTopicParts = simpleRule.GetInTopic().Split("/");
                 StringBuilder strBuilder = new StringBuilder();
                 TopicVertex lastVertex = null;
                 TopicVertex aktualVertex = null;
@@ -34,15 +34,16 @@ namespace TopicTrennerAPI.Service
                     strBuilder.Append("/");
                     lastVertex = aktualVertex;
                 }
-                aktualVertex.Rules.Add(new Rule(aktualVertex, simpleRule));
+                aktualVertex.AlgoRule.Add(ruleFactory.CreateRule(aktualVertex, simpleRule));
             }
         }
 
-        public void CreateTopicRulesFromSimpleRules(ref Dictionary<string, TopicVertex> topicRules, List<SimpleRule> simpleRules)
+
+        public void CreateTopicVertexFromTopics(ref Dictionary<string, TopicVertex> topicRules, List<ISimpleRule> simpleRules, IAlgoRuleFactory ruleFactory)
         {
             foreach(SimpleRule sRule in simpleRules)
             {
-                CreateTopicRulesFromSimpleRule(ref topicRules, sRule);
+                CreateTopicVertexFromTopic(ref topicRules, sRule, ruleFactory);
             }
         }
     }

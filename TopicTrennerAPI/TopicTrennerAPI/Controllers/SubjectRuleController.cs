@@ -12,24 +12,22 @@ namespace TopicTrennerAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SimpleRuleSubjectController : ControllerBase
+    public class SubjectRuleController : ControllerBase
     {
         readonly DbTopicTrennerContext _context;
 
-        public SimpleRuleSubjectController(DbTopicTrennerContext context)
+        public SubjectRuleController(DbTopicTrennerContext context)
         {
             _context = context;
         }
 
-        // GET: api/SimpleRuleSubject
         [HttpGet]
         public ActionResult<IEnumerable<SimpleRuleSubject>> Get()
         {
-            var sub = _context.SimpleRuleSubjects;
+            var sub = _context.SimpleRuleSubjects.ToList();
             return sub;
         }
 
-        // GET: api/SimpleRuleSubject/5
         [HttpGet("{id}")]
         public async Task<ActionResult<SimpleRuleSubject>> Get(int id)
         {
@@ -42,15 +40,20 @@ namespace TopicTrennerAPI.Controllers
             return null;
         }
 
-        // POST: api/SimpleRuleSubject
         [HttpPost]
-        public void Post(SimpleRuleSubject sSimpleRuleSubject)
+        public IActionResult Post(SimpleRuleSubject sSimpleRuleSubject)
         {
+            if (sSimpleRuleSubject.ID != 0 && _context.SimpleRuleSubjects.Find(sSimpleRuleSubject.ID) != null)
+            {
+                return BadRequest();
+            }
+
             _context.SimpleRuleSubjects.Add(sSimpleRuleSubject);
             _context.SaveChangesAsync();
+
+            return NoContent();
         }
 
-        // PUT: api/SimpleRuleSubject/5
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, SimpleRuleSubject sSimpleRuleSubject)
         {
@@ -64,7 +67,6 @@ namespace TopicTrennerAPI.Controllers
             return NoContent();
         }
 
-        // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

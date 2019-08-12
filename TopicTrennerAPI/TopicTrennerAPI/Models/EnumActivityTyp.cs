@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace TopicTrennerAPI.Models
 {
-    public enum EnumSubjectTyp
+    public enum EnumActivityTyp
     {
-        device, world, deviceTwin, worldTwin
+        activ, deactiv, auto, activeauto, deactivauto
     }
 }

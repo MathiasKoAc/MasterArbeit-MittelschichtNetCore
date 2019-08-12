@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace TopicTrennerAPI.Models
+namespace TopicTrennerAPI.Models.Command
 {
-    public enum EnumSubjectTyp
+    public enum EnumSubjectStatus
     {
-        device, world, deviceTwin, worldTwin
+        on, off, affected
     }
 }

@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace TopicTrennerAPI.Models
 {
-    public enum EnumSubjectTyp
+    public enum EnumPurposeMessageTyp
     {
-        device, world, deviceTwin, worldTwin
+        startup, shutdown
     }
 }

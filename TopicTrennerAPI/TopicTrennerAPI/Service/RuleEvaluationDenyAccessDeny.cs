@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 namespace TopicTrennerAPI.Service
 {
     //alternativ Implementierung von RuleEvaluationService um DenyAccessDeny zu ermöglichen
-    public class RuleEvaluationDenyAccessDeny : IMqttTopicReceiver, IRuleEvaluation
+    public class RuleEvaluationDenyAccessDeny : IMqttTopicReceiver, IServeRuleEvaluation
     {
         readonly IMqttConnector mqttCon;
 
@@ -42,7 +42,9 @@ namespace TopicTrennerAPI.Service
                 return;
             }
 
-            string[] topicParts = topic.Trim().ToLower().Split("/");
+            string cleanedTopic = topic.Trim().ToLower();
+            cleanedTopic = cleanedTopic.StartsWith('/') ? cleanedTopic.Substring(1) : cleanedTopic;
+            string[] topicParts = cleanedTopic.Split("/");
 
             if (CheckDeny(topicParts, TopicRulesDenyIn))
             {
@@ -61,7 +63,7 @@ namespace TopicTrennerAPI.Service
 
         private void TreeWalk(byte[] message, string[] topicPartsMessageIn, int topicPartIndex, TopicVertex topicVertxRule)
         {
-            if (topicVertxRule.Rules.Count > 0)
+            if (topicVertxRule.AlgoRule.Count > 0)
             {
                 CheckTheRuleAndSend(message, topicPartsMessageIn, topicPartIndex, topicVertxRule);
             }
@@ -84,7 +86,7 @@ namespace TopicTrennerAPI.Service
         //return true by deny
         private bool TreeWalkDeny(string[] topicPartsMessageIn, int topicPartIndex, TopicVertex topicVertxRule)
         {
-            if (topicVertxRule.Rules.Count > 0)
+            if (topicVertxRule.AlgoRule.Count > 0)
             {
                 return CheckTheRuleMatch(topicPartsMessageIn, topicPartIndex, topicVertxRule);
             }
@@ -118,7 +120,7 @@ namespace TopicTrennerAPI.Service
         private bool CheckTheRuleMatch(string[] topicPartsMessageIn, int topicPartIndex, TopicVertex topicVertxRule)
         {
             // wenn keine Rul da, dann gibt es nix zu tuen
-            if (topicVertxRule.Rules.Count == 0)
+            if (topicVertxRule.AlgoRule.Count == 0)
             {
                 return false;
             }
@@ -144,7 +146,7 @@ namespace TopicTrennerAPI.Service
         private void CheckTheRuleAndSend(byte[] message, string[] topicPartsMessageIn, int topicPartIndex, TopicVertex topicVertxRule)
         {
             // wenn keine Rul da, dann gibt es nix zu tuen
-            if(topicVertxRule.Rules.Count == 0)
+            if(topicVertxRule.AlgoRule.Count == 0)
             {
                 return;
             }
@@ -152,7 +154,7 @@ namespace TopicTrennerAPI.Service
             // wenn # dann feuer
             if (topicVertxRule.TopicPart == "#")
             {
-                SendTheMessagesByRules(message, topicPartsMessageIn, topicVertxRule.Rules);
+                SendTheMessagesByRules(message, topicPartsMessageIn, topicVertxRule.AlgoRule);
             }
 
             // wenn der topicPart übereinstimmt und das der letzt Part ist dann feuer
@@ -160,14 +162,16 @@ namespace TopicTrennerAPI.Service
                 && (topicPartsMessageIn[topicPartIndex] == topicVertxRule.TopicPart
                     || topicPartsMessageIn[topicPartIndex] == "+"))
             {
-                SendTheMessagesByRules(message, topicPartsMessageIn, topicVertxRule.Rules);
+                SendTheMessagesByRules(message, topicPartsMessageIn, topicVertxRule.AlgoRule);
             }
         }
 
-        private void SendTheMessagesByRules(byte[] message, string[] topicPartsMessageIn, List<Rule> Rules)
+        private void SendTheMessagesByRules(byte[] message, string[] topicPartsMessageIn, List<IAlgoRule> Rules)
         {
-            foreach(Rule r in Rules)
+            foreach(IAlgoRule ar in Rules)
             {
+                Rule r = (Rule)ar;
+
                 if(!r.OutTopicHasWildcard && !CheckDeny(r.OutTopic, TopicRulesDenyOut)) //wenn keine Wildcard drin und topicOut erlaubt
                 {
                     // normal senden
@@ -236,7 +240,7 @@ namespace TopicTrennerAPI.Service
                 if(multiLevelWildModus)
                 {
                     for(;i < topicPartsMessageIn.Count(); i++) {
-                        // TODO go over the MessageParts and replace the #
+                        //go over the MessageParts and replace the #
                         topicBuild.Append("/");
                         topicBuild.Append(topicPartsMessageIn[i]);
                     }
@@ -280,11 +284,6 @@ namespace TopicTrennerAPI.Service
         {
             _active = false;
             Console.WriteLine("RuleEvaluationDenyAccessDeny finished: OnStopApplication");
-        }
-
-        public int GetActiveSessionId()
-        {
-            throw new NotImplementedException();
         }
     }
 }

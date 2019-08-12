@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -17,9 +16,9 @@ namespace TopicTrennerAPI.Controllers
         //Controller for Model typ SimpleRule
 
         readonly DbTopicTrennerContext _context;
-        readonly IControlRuleSessions _ctrlRuleSession;
+        readonly IManageRuleService _ctrlRuleSession;
 
-        public RuleController(DbTopicTrennerContext context, IControlRuleSessions ctrlRuleSession)
+        public RuleController(DbTopicTrennerContext context, IManageRuleService ctrlRuleSession)
         {
             _context = context;
             _ctrlRuleSession = ctrlRuleSession;
@@ -49,19 +48,21 @@ namespace TopicTrennerAPI.Controllers
 
         // POST: api/Rule
         [HttpPost]
-        public void Post(SimpleRule sRule)
+        public IActionResult Post(SimpleRule sRule)
         {
+            if (sRule.ID != 0 && _context.Rules.Find(sRule.ID) != null)
+            {
+                return BadRequest();
+            }
+
             sRule.InTopic = sRule.InTopic?.ToLower();
             sRule.OutTopic = sRule.OutTopic?.ToLower();
 
             _context.Rules.Add(sRule);
             _context.SaveChanges();
 
-            Session ses = _context.Sessions.Include(s => s.SessionRuns).Where(s => s.ID == sRule.SessionID).First();
-            if(ses != null && ses.IsActive())
-            {
-                _ctrlRuleSession.ReloadRules(ses.ID);
-            }
+            ReloadSessionRun(sRule.SessionID);
+            return NoContent();
         }
 
         // PUT: api/Rule/5
@@ -79,11 +80,7 @@ namespace TopicTrennerAPI.Controllers
             _context.Entry(sRule).State = EntityState.Modified;
             _context.SaveChanges();
 
-            Session ses = _context.Sessions.Include(s => s.SessionRuns).Where(s => s.ID == sRule.SessionID).First();
-            if (ses.IsActive())
-            {
-                _ctrlRuleSession.ReloadRules(ses.ID);
-            }
+            ReloadSessionRun(sRule.SessionID);
             return NoContent();
         }
 
@@ -97,11 +94,22 @@ namespace TopicTrennerAPI.Controllers
             {
                 return NotFound();
             }
+            var sessionId = rule.SessionID;
 
             _context.Rules.Remove(rule);
             await _context.SaveChangesAsync();
 
+            ReloadSessionRun(sessionId);
             return NoContent();
+        }
+
+        private void ReloadSessionRun(int SessionId)
+        {
+            SessionRun sesRun = _context.SessionRuns.Where(s => s.Session.ID == SessionId).First();
+            if (sesRun != null && sesRun.Active)
+            {
+                _ctrlRuleSession.ReloadRules(sesRun.ID);
+            }
         }
     }
 }

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace TopicTrennerAPI.Models
+namespace TopicTrennerAPI.Interfaces
 {
-    public enum EnumSubjectTyp
+    public interface IFindSessionRun
     {
-        device, world, deviceTwin, worldTwin
+        int GetActivSessionRun();
     }
 }

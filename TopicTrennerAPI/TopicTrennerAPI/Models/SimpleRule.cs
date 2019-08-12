@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using TopicTrennerAPI.Interfaces;
 
 namespace TopicTrennerAPI.Models
 {
-    public class SimpleRule
+    public class SimpleRule : ISimpleRule
     {
         public int ID { get; set; }
         public string InTopic { get; set; }
@@ -16,5 +14,22 @@ namespace TopicTrennerAPI.Models
         public Session Session { get; set; }
         public int SessionID { get; set; }
         public EnumSimpleRuleTyp SimpleRuleTyp { get; set; }
+
+
+
+        public string GetInTopic()
+        {
+            return InTopic;
+        }
+
+        public string GetOutTopic()
+        {
+            return OutTopic;
+        }
+
+        public bool IsActive()
+        {
+            return Active;
+        }
     }
 }

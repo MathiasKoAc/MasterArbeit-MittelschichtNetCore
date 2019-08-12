@@ -44,10 +44,16 @@ namespace TopicTrennerAPI.Controllers
 
         // POST: api/Subject
         [HttpPost]
-        public void Post(Subject sSubject)
+        public IActionResult Post(Subject sSubject)
         {
+            if (sSubject.ID != 0 && _context.Subjects.Find(sSubject.ID) != null)
+            {
+                return BadRequest();
+            }
+
             _context.Subjects.Add(sSubject);
-            _context.SaveChangesAsync();
+            _context.SaveChanges();
+            return NoContent();
         }
 
         // PUT: api/Subject/5

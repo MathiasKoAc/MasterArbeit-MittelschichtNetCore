@@ -15,14 +15,20 @@ namespace TopicTrennerAPI.Controllers
     public class SessionRunController : ControllerBase
     {
         readonly DbTopicTrennerContext _context;
-        readonly IControlRuleSessions _ctrlRuleSession;
-        readonly IControlTimeSession _ctrlTimeSession;
+        readonly IManageRuleService _manageRuleSevice;
+        readonly IManageTimeService _manageTimeSevice;
+        readonly IManageLogService _manageLogService;
+        readonly IManageEventService _manageEventService;
 
-        public SessionRunController(DbTopicTrennerContext context, IControlRuleSessions ctrlRuleSession, IControlTimeSession controlTimeSession)
+        public SessionRunController(DbTopicTrennerContext context, IManageRuleService ctrlRuleSession,
+                                    IManageTimeService controlTimeSession, IManageLogService logService,
+                                    IManageEventService eventService)
         {
             _context = context;
-            _ctrlRuleSession = ctrlRuleSession;
-            _ctrlTimeSession = controlTimeSession;
+            _manageRuleSevice = ctrlRuleSession;
+            _manageTimeSevice = controlTimeSession;
+            _manageLogService = logService;
+            _manageEventService = eventService;
         }
 
         // GET: api/SessionRun
@@ -48,8 +54,14 @@ namespace TopicTrennerAPI.Controllers
 
         // POST: api/SessionRun
         [HttpPost]
-        public void Post(SessionRun sessionR)
+        public IActionResult Post(SessionRun sessionR)
         {
+            //TODO umbauen rückgabe von START/STOP einbauen
+            if(sessionR.ID != 0 && _context.SessionRuns.Find(sessionR.ID) != null)
+            {
+                return BadRequest();
+            }
+
             if (sessionR.Active)
             {
                 SetAllInactiveActive();
@@ -59,16 +71,17 @@ namespace TopicTrennerAPI.Controllers
 
             if(sessionR.Active)
             {
-                int sessId = sessionR.SessionID;
-                _ctrlRuleSession.StartRuleSession(sessId);
-                _ctrlTimeSession.StartTimeService(sessId);
+                StartSessionRun(sessionR.ID);
             }
+            return NoContent();
         }
 
         // PUT: api/SessionRun/5
         [HttpPut("{id}")]
         public IActionResult Put(int id, SessionRun sessionR)
         {
+            //TODO umbauen rückgabe von START/STOP einbauen
+
             if (id != sessionR.ID)
             {
                 //we dont change IDs
@@ -80,26 +93,38 @@ namespace TopicTrennerAPI.Controllers
                 return NotFound();
             }
 
-            var oldSessionR = _context.SessionRuns.Find(id);
-
             if (sessionR.Active)
             {
-                SetAllInactiveActive();
-                _ctrlRuleSession.StartRuleSession(sessionR.SessionID);
-                _ctrlTimeSession.StartTimeService(sessionR.SessionID);
-            }
-            else if(!sessionR.Active)
-            {
-                _ctrlRuleSession.StopRuleSession(sessionR.SessionID);
-                _ctrlTimeSession.StopTimeService(sessionR.SessionID);
-            }
+                var runs = _context.SessionRuns;
+                foreach (SessionRun r in runs)
+                {
+                    if (r.Active)
+                    {
+                        r.Active = false;
+                        StopSessionRun(r.ID);
+                        if (r.StopTime == null)
+                        {
+                            r.StopTime = DateTime.Now;
+                        }
+                    }
 
-            oldSessionR.Active = sessionR.Active;
-            if(sessionR.StopTime != null)
+                    if(r.ID == sessionR.ID)
+                    {
+                        r.Beschreibung = sessionR.Beschreibung;
+                        r.SessionID = sessionR.SessionID;
+                        r.StartTime = sessionR.StartTime;
+                        r.Active = sessionR.Active;
+                    }                        
+                }
+                StartSessionRun(sessionR.ID);
+            }
+            else
             {
-                oldSessionR.StopTime = sessionR.StopTime;
+                _context.Entry(sessionR).State = EntityState.Modified;
+                StopSessionRun(sessionR.ID);
             }
             _context.SaveChanges();
+
             return NoContent();
         }
 
@@ -107,6 +132,8 @@ namespace TopicTrennerAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
+            //TODO umbauen rückgabe von START/STOP einbauen
+
             if (_context.SessionRuns.Count() > 0)
             {
                 var sessionR = await _context.SessionRuns.FindAsync(id);
@@ -117,20 +144,30 @@ namespace TopicTrennerAPI.Controllers
 
                 if(sessionR.Active)
                 {
-                    _ctrlRuleSession.StopRuleSession(sessionR.SessionID);
-                    _ctrlTimeSession.StopTimeService(sessionR.SessionID);
+                    StopSessionRun(sessionR.ID);
                 }
                 
-                sessionR.Active = false;
-                if(sessionR.StopTime == null)
-                {
-                    sessionR.StopTime = DateTime.Now;
-                }
-                _context.Entry(sessionR).State = EntityState.Modified;
+                _context.SessionRuns.Remove(sessionR);
                 _context.SaveChanges();
             }
 
-            return null;
+            return NoContent();
+        }
+
+        private void StartSessionRun(int id)
+        {
+            _manageRuleSevice.StartRuleSession(id);
+            _manageTimeSevice.StartTimeService(id);
+            _manageLogService.StartLogService(id);
+            _manageEventService.StartEventService(id);
+        }
+
+        private void StopSessionRun(int id)
+        {
+            _manageRuleSevice.StopRuleSession(id);
+            _manageTimeSevice.StopTimeService(id);
+            _manageLogService.StopLogService(id);
+            _manageEventService.StopEventService(id);
         }
 
         private void SetAllInactiveActive()
@@ -139,13 +176,12 @@ namespace TopicTrennerAPI.Controllers
             foreach (SessionRun r in runs)
             {
                 r.Active = false;
-                _ctrlRuleSession.StopRuleSession(r.SessionID);
+                StopSessionRun(r.ID);
                 if (r.StopTime == null)
                 {
                     r.StopTime = DateTime.Now;
                 }
             }
-            _context.SaveChanges();
         }
     }
 }

@@ -6,7 +6,7 @@ using TopicTrennerAPI.Models;
 
 namespace TopicTrennerAPI.Interfaces
 {
-    public interface IRuleEvaluation
+    public interface IServeRuleEvaluation
     {
         void SetTopicRulesAccess(Dictionary<string, TopicVertex> accessRules);
         void SetTopicRulesDenyIn(Dictionary<string, TopicVertex> denyInRules);
@@ -14,6 +14,5 @@ namespace TopicTrennerAPI.Interfaces
 
         bool IsRuleEvaluationActive();
         void SetRuleEvaluationActive(bool active);
-        int GetActiveSessionId();
     }
 }
