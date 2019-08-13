@@ -105,10 +105,14 @@ namespace TopicTrennerAPI.Controllers
 
         private void ReloadSessionRun(int SessionId)
         {
-            SessionRun sesRun = _context.SessionRuns.Where(s => s.Session.ID == SessionId).First();
-            if (sesRun != null && sesRun.Active)
+            var sesRunCall = _context.SessionRuns.Where(s => s.Session.ID == SessionId);
+            if(sesRunCall.Count() > 0)
             {
-                _ctrlRuleSession.ReloadRules(sesRun.ID);
+                SessionRun sesRun = sesRunCall.First();
+                if (sesRun != null && sesRun.Active)
+                {
+                    _ctrlRuleSession.ReloadRules(sesRun.ID);
+                }
             }
         }
     }
