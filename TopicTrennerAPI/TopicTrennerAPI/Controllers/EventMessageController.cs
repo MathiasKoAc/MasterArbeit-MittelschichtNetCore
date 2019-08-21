@@ -61,7 +61,7 @@ namespace TopicTrennerAPI.Controllers
 
         // PUT: api/EventMessage/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, EventMessage sEventMessage)
+        public IActionResult Put(int id, EventMessage sEventMessage)
         {
             if(id != sEventMessage.ID)
             {

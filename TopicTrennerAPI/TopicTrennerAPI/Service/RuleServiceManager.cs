@@ -43,7 +43,7 @@ namespace TopicTrennerAPI.Service
 
         private Dictionary<string, TopicVertex> LoadRules(int sessionRunId, EnumSimpleRuleTyp ruleTyp = EnumSimpleRuleTyp.access)
         {
-            ///dicTv key ist TopicVertex.TopicChain also die TopicPartsKette bis inkl diesem TopicPart
+            //dicTv key ist TopicVertex.TopicChain also die TopicPartsKette bis inkl diesem TopicPart
             Dictionary<string, TopicVertex> topicRules = new Dictionary<string, TopicVertex>();
 
             var sessionId = dbContext.SessionRuns.Where(s => s.ID == sessionRunId).First().SessionID;

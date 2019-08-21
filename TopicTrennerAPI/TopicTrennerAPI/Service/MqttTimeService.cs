@@ -10,7 +10,7 @@ namespace TopicTrennerAPI.Service
     {
         readonly IMqttConnector _mqttCon;
         TimeSpan _timeDiff;
-        volatile bool _acitve = false;
+        volatile bool _active = false;
         Task runningTask;
 
         //TODO in SETUP CLASS / INTERFACE
@@ -28,7 +28,7 @@ namespace TopicTrennerAPI.Service
 
         public bool IsTimeServiceActive()
         {
-            return _acitve;
+            return _active;
         }
 
         public void SetTimeDiff(TimeSpan timeDiff)
@@ -38,7 +38,7 @@ namespace TopicTrennerAPI.Service
 
         public void SetTimeServiceActive(bool active)
         {
-            _acitve = active;
+            _active = active;
             if(active && (runningTask == null || runningTask.Status != TaskStatus.Running))
             {
                 runningTask = Task.Run(SendTimeLoop);
@@ -53,13 +53,13 @@ namespace TopicTrennerAPI.Service
 
         private void SendTimeLoop()
         {
-            while(_acitve)
+            while(_active)
             {
                 _mqttCon.PublishMessage("simulation/fulldate", (DateTime.Now + _timeDiff).ToString("yyyy:MM:ddTHH:mm:ssZ"), MqttQualityOfService);
                 _mqttCon.PublishMessage("simulation/date", (DateTime.Now + _timeDiff).ToString("yyyy:MM:dd"), MqttQualityOfService);
                 _mqttCon.PublishMessage("simulation/time", (DateTime.Now + _timeDiff).ToLongTimeString(), MqttQualityOfService);
 
-                for (int i = 0; i < waitSeconds && _acitve; i++)
+                for (int i = 0; i < waitSeconds && _active; i++)
                 {
                     Thread.Sleep(1000);
                 }
@@ -68,7 +68,7 @@ namespace TopicTrennerAPI.Service
 
         private void OnStopApplication()
         {
-            _acitve = false;
+            _active = false;
             Console.WriteLine("MqttTimeService finished: OnStopApplication");
         }
     }

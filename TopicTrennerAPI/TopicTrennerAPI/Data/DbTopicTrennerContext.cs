@@ -7,7 +7,7 @@ namespace TopicTrennerAPI.Data
 {
     public class DbTopicTrennerContext : DbContext
     {
-        private static string _dbConfigStr = null;
+        private static string _dbConfigStr;
         public static string DbConfigString {
             set
             {

@@ -41,7 +41,7 @@ namespace TopicTrennerAPI.Service
 
         public void CreateTopicVertexFromTopics(ref Dictionary<string, TopicVertex> topicRules, List<ISimpleRule> simpleRules, IAlgoRuleFactory ruleFactory)
         {
-            foreach(SimpleRule sRule in simpleRules)
+            foreach(ISimpleRule sRule in simpleRules)
             {
                 CreateTopicVertexFromTopic(ref topicRules, sRule, ruleFactory);
             }

@@ -5,10 +5,10 @@ namespace TopicTrennerAPI.Models
     public class Rule : IAlgoRule
     {
         private string _outTopic;
-        private string[] _outTopicParts = null;
+        private string[] _outTopicParts;
         public TopicVertex InTopic { get; set; }
         public bool Active { get; set; }
-        public bool OutTopicHasWildcard { get; private set; } = false;
+        public bool OutTopicHasWildcard { get; private set; }
 
         public string OutTopic
         {
