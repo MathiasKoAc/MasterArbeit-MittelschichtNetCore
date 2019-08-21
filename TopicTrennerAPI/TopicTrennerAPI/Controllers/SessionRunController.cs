@@ -172,7 +172,7 @@ namespace TopicTrennerAPI.Controllers
 
         private void SetAllInactiveActive()
         {
-            var runs = _context.SessionRuns.Where(sr => sr.Active == true);
+            var runs = _context.SessionRuns.Where(sr => sr.Active);
             foreach (SessionRun r in runs)
             {
                 r.Active = false;

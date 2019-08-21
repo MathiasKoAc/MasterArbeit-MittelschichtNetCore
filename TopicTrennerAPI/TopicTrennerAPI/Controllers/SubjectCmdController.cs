@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using TopicTrennerAPI.Models;
 using TopicTrennerAPI.Models.Command;
 using TopicTrennerAPI.Interfaces;

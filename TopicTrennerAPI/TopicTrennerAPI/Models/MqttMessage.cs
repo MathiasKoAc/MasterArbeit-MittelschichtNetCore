@@ -1,5 +1,4 @@
-﻿using TopicTrennerAPI.Interfaces;
-
+﻿
 namespace TopicTrennerAPI.Models
 {
     public class MqttMessage

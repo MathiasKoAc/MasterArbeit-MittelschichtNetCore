@@ -1,5 +1,4 @@
-﻿using TopicTrennerAPI.Models;
-
+﻿
 namespace TopicTrennerAPI.Interfaces
 {
     public interface ISimpleRule

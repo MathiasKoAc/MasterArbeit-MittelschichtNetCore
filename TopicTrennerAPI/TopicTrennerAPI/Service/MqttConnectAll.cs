@@ -76,7 +76,7 @@ namespace TopicTrennerAPI.Service
          */
         void Client_MqttMsgPublishReceived(object sender, MqttMsgPublishEventArgs e)
         {
-            Console.WriteLine(new StringBuilder("Received: ").Append(System.Text.Encoding.UTF8.GetString(e.Message)).Append(" Topic: ").Append(e.Topic));
+            Console.WriteLine(new StringBuilder("Received: ").Append(Encoding.UTF8.GetString(e.Message)).Append(" Topic: ").Append(e.Topic));
             receiverQueue.Add(e);//Enqueue(e);
         }
 
@@ -174,7 +174,7 @@ namespace TopicTrennerAPI.Service
 
         public void PublishMessage(string topic, string Message, byte MqttQOS_Level, bool retain = false)
         {
-            this.PublishMessage(topic, System.Text.Encoding.UTF8.GetBytes(Message), MqttQOS_Level, retain);
+            this.PublishMessage(topic, Encoding.UTF8.GetBytes(Message), MqttQOS_Level, retain);
         }
 
         public void PublishMessage(string topic, byte[] Message, byte MqttQOS_Level, bool retain = false)

@@ -54,7 +54,7 @@ namespace TopicTrennerAPI.Service
 
         private List<ISimpleRule> ReadToSimpleRuleList(int sessionId, EnumSimpleRuleTyp ruleTyp = EnumSimpleRuleTyp.access)
         {
-            var rules = dbContext.Rules.Where(r => r.SessionID == sessionId && r.SimpleRuleTyp.Equals(ruleTyp) && r.Active == true);
+            var rules = dbContext.Rules.Where(r => r.SessionID == sessionId && r.SimpleRuleTyp.Equals(ruleTyp) && r.Active);
 
             List<SimpleRule> ruleList = rules.ToList();
             List<ISimpleRule> iSimple = new List<ISimpleRule>();

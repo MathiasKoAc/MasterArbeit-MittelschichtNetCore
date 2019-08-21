@@ -19,7 +19,7 @@ namespace TopicTrennerAPI.Service
 
         public int GetActivSessionRun()
         {
-            var sessionRunCall = _dbContext.SessionRuns.Where(sr => sr.Active == true);
+            var sessionRunCall = _dbContext.SessionRuns.Where(sr => sr.Active);
             if(sessionRunCall.Count() > 0)
             {
                 var sessionRun = sessionRunCall.First();

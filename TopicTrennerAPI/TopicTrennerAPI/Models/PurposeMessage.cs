@@ -1,6 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
-
+﻿
 namespace TopicTrennerAPI.Models
 {
     public class PurposeMessage : MqttMessage

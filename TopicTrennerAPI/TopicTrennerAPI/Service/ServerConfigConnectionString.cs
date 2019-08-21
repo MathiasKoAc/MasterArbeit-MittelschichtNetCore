@@ -1,5 +1,4 @@
-﻿using System;
-using TopicTrennerAPI.Interfaces;
+﻿using TopicTrennerAPI.Interfaces;
 using Microsoft.Extensions.Configuration;
 
 namespace TopicTrennerAPI.Service
