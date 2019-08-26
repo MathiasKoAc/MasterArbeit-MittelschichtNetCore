@@ -10,7 +10,7 @@ indem Sie diese MSBuild-Datei bearbeiten. Weitere Informationen hierzu finden Si
   </PropertyGroup>
   <ItemGroup>
     <DestinationConnectionStrings Include="DbDefaultConnection">
-      <Value>Server=192.168.0.148%3b Port=3306%3b Database=smile%3b user=smile%3b Pwd=as7da5sd75po57a5sd7ajnk75jsgjk7svnxsc5v7nkjs7n11kjn7ekjhfg%3b charset=utf8%3b</Value>
+      <Value>Server=127.0.0.1%3b Port=3306%3b Database=smile%3b user=smile%3b Pwd=as7da5sd75po57a5sd7ajnk75jsgjk7svnxsc5v7nkjs7n11kjn7ekjhfg%3b charset=utf8%3b</Value>
     </DestinationConnectionStrings>
     <DestinationConnectionStrings Include="MqttDefaulConnectionPasswort">
       <Value>

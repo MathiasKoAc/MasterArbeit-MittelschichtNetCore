@@ -18,18 +18,18 @@ namespace TopicTrennerAPI.Service
             _serveTime = serveTime;
         }
 
-        public void ReloadTimeService(int SessionRunId)
+        public void ReloadTimeService(int sessionRunId)
         {
-            var diffCall = _dbcontext.TimeDiffs.Where(t => t.ID == SessionRunId);
+            var diffCall = _dbcontext.TimeDiffs.Where(t => t.ID == sessionRunId);
 
             if(diffCall.Count() > 0) {
                 var diff = diffCall.First();
                 TimeSpan d = (diff == null || diff.Diff == null) ? TimeSpan.Zero : diff.Diff;
-                ReloadTimeService(SessionRunId, d);
+                ReloadTimeService(sessionRunId, d);
             }
         }
 
-        public void ReloadTimeService(int SessionRunId, TimeSpan timeDiff)
+        public void ReloadTimeService(int sessionRunId, TimeSpan timeDiff)
         {
             _serveTime.SetTimeDiff(timeDiff);
 
@@ -39,19 +39,19 @@ namespace TopicTrennerAPI.Service
             }
         }
 
-        public void StartTimeService(int SessionRunId)
+        public void StartTimeService(int sessionRunId)
         {
-            var diff = _dbcontext.TimeDiffs.Find(SessionRunId);
+            var diff = _dbcontext.TimeDiffs.Find(sessionRunId);
             TimeSpan d = (diff == null || diff.Diff == null) ? TimeSpan.Zero : diff.Diff;
             _serveTime.SetTimeServiceActive(true, d);
         }
 
-        public void StartTimeService(int SessionRunId, TimeSpan timeDiff)
+        public void StartTimeService(int sessionRunId, TimeSpan timeDiff)
         {
             _serveTime.SetTimeServiceActive(true, timeDiff);
         }
 
-        public void StopTimeService(int SessionRunId)
+        public void StopTimeService(int sessionRunId)
         {
             _serveTime.SetTimeServiceActive(false);
         }

@@ -38,12 +38,7 @@ namespace TopicTrennerAPI
                 //Nur Spezielle durchlassen
                 options.AddPolicy(MyAllowSpecificOrigins, builder =>
                 {
-                    builder.WithOrigins("http://localhost",
-                        "https://localhost",
-                        "http://localhost:63342",
-                        "https://localhost:63342",
-                        "http://localhost:8000",
-                        "https://localhost:8000")
+                    builder.AllowAnyOrigin()
                         .AllowAnyHeader().
                         AllowAnyMethod();
                 });
