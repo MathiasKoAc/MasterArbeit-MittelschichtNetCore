@@ -14,9 +14,9 @@ namespace TopicTrennerAPI.Service
         readonly IMqttConnector mqttCon;
 
         ///TopicRules key ist TopicVertex.TopicChain also die TopicPartsKette bis inkl diesem TopicPart
-        Dictionary<string, TopicVertex> TopicRulesAccess;
-        Dictionary<string, TopicVertex> TopicRulesDenyIn;
-        Dictionary<string, TopicVertex> TopicRulesDenyOut;
+        private Dictionary<string, TopicVertex> topicRulesAccess;
+        private Dictionary<string, TopicVertex> topicRulesDenyIn;
+        private Dictionary<string, TopicVertex> topicRulesDenyOut;
 
 
         public EnumMqttQualityOfService MqttQualityOfService = EnumMqttQualityOfService.QOS_LEVEL_AT_LEAST_ONCE;
@@ -30,7 +30,7 @@ namespace TopicTrennerAPI.Service
             this.mqttCon = mqttConnector;
 
             //TODO checken ob nicht zu häftig:
-            this.mqttCon.AddTopicReceiver("#", this, EnumMqttQualityOfService.QOS_LEVEL_EXACTLY_ONCE);
+            this.mqttCon.AddTopicReceiver("#", this);
             applicationLifttime.ApplicationStopping.Register(OnStopApplication);
             Console.WriteLine("RuleEvaluationDenyAccessDeny Started");
         }
@@ -46,16 +46,16 @@ namespace TopicTrennerAPI.Service
             cleanedTopic = cleanedTopic.StartsWith('/') ? cleanedTopic.Substring(1) : cleanedTopic;
             string[] topicParts = cleanedTopic.Split("/");
 
-            if (CheckDeny(topicParts, TopicRulesDenyIn))
+            if (CheckDeny(topicParts, topicRulesDenyIn))
             {
                 //Topic Denyed by DenyIn-Rule
                 return;
             }
 
             //TODO topic check wie im Bsp von GITHUB
-            if (topicParts[0] != null && TopicRulesAccess.TryGetValue(topicParts[0], out TopicVertex tv_access))
+            if (topicParts[0] != null && topicRulesAccess.TryGetValue(topicParts[0], out TopicVertex tvAccess))
             {
-                TreeWalk(message, topicParts, 0, tv_access);
+                TreeWalk(message, topicParts, 0, tvAccess);
             }
             
             //if there is no topic to match... do nothing
@@ -169,18 +169,18 @@ namespace TopicTrennerAPI.Service
             }
         }
 
-        private void SendTheMessagesByRules(byte[] message, string[] topicPartsMessageIn, List<IAlgoRule> Rules)
+        private void SendTheMessagesByRules(byte[] message, string[] topicPartsMessageIn, List<IAlgoRule> rules)
         {
-            foreach(IAlgoRule ar in Rules)
+            foreach(IAlgoRule ar in rules)
             {
                 Rule r = (Rule)ar;
 
-                if(!r.OutTopicHasWildcard && !CheckDeny(r.OutTopic, TopicRulesDenyOut)) //wenn keine Wildcard drin und topicOut erlaubt
+                if(!r.OutTopicHasWildcard && !CheckDeny(r.OutTopic, topicRulesDenyOut)) //wenn keine Wildcard drin und topicOut erlaubt
                 {
                     // normal senden
                     this.mqttCon.PublishMessage(r.OutTopic, message, (byte) this.MqttQualityOfService);
                 }
-                else if (TryBuildTopicOutByWildcardRule(topicPartsMessageIn, r, out string topicOut) && !CheckDeny(topicOut, TopicRulesDenyOut))
+                else if (TryBuildTopicOutByWildcardRule(topicPartsMessageIn, r, out string topicOut) && !CheckDeny(topicOut, topicRulesDenyOut))
                 {
                     //senden, wenn Topic gebuilded werden konnte und topicOut erlaubt
                     this.mqttCon.PublishMessage(topicOut, message, (byte)this.MqttQualityOfService);
@@ -191,7 +191,7 @@ namespace TopicTrennerAPI.Service
         //deny = true
         private bool CheckDeny(string[] topicParts, Dictionary<string, TopicVertex> topicRulesDeny)
         {
-            if (topicRulesDeny.TryGetValue(topicParts[0], out TopicVertex tv_denyIn) && TreeWalkDeny(topicParts, 0, tv_denyIn))
+            if (topicRulesDeny.TryGetValue(topicParts[0], out TopicVertex tvDenyIn) && TreeWalkDeny(topicParts, 0, tvDenyIn))
             {
                 return true;
             }
@@ -257,17 +257,17 @@ namespace TopicTrennerAPI.Service
 
         public void SetTopicRulesAccess(Dictionary<string, TopicVertex> accessRules)
         {
-            TopicRulesAccess = accessRules;
+            topicRulesAccess = accessRules;
         }
 
         public void SetTopicRulesDenyIn(Dictionary<string, TopicVertex> denyInRules)
         {
-            TopicRulesDenyIn = denyInRules;
+            topicRulesDenyIn = denyInRules;
         }
 
         public void SetTopicRulesDenyOut(Dictionary<string, TopicVertex> denyOutRules)
         {
-            TopicRulesDenyOut = denyOutRules;
+            topicRulesDenyOut = denyOutRules;
         }
 
         public bool IsRuleEvaluationActive()
