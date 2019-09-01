@@ -46,6 +46,11 @@ namespace TopicTrennerAPI.Service
             cleanedTopic = cleanedTopic.StartsWith('/') ? cleanedTopic.Substring(1) : cleanedTopic;
             string[] topicParts = cleanedTopic.Split("/");
 
+            if (topicParts[0] == null)
+            {
+                return;
+            } 
+            
             if (CheckDeny(topicParts, topicRulesDenyIn))
             {
                 //Topic Denyed by DenyIn-Rule
@@ -53,7 +58,7 @@ namespace TopicTrennerAPI.Service
             }
 
             //TODO topic check wie im Bsp von GITHUB
-            if (topicParts[0] != null && topicRulesAccess.TryGetValue(topicParts[0], out TopicVertex tvAccess))
+            if (topicRulesAccess.TryGetValue(topicParts[0], out TopicVertex tvAccess))
             {
                 TreeWalk(message, topicParts, 0, tvAccess);
             }
