@@ -2,6 +2,7 @@
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using TopicTrennerAPI.Models;
 using TopicTrennerAPI.Interfaces;
 using Microsoft.AspNetCore.Hosting;
@@ -11,7 +12,7 @@ namespace TopicTrennerAPI.Service
     //alternativ Implementierung von RuleEvaluationService um DenyAccessDeny zu ermöglichen
     public class RuleEvaluationDenyAccessDeny : IMqttTopicReceiver, IServeRuleEvaluation
     {
-        readonly IMqttConnector mqttCon;
+        private readonly IMqttConnector mqttCon;
 
         ///TopicRules key ist TopicVertex.TopicChain also die TopicPartsKette bis inkl diesem TopicPart
         private Dictionary<string, TopicVertex> topicRulesAccess;
@@ -49,11 +50,16 @@ namespace TopicTrennerAPI.Service
             if (topicParts[0] == null)
             {
                 return;
-            } 
-            
+            }
+
+            Task.Run(() => CompleteCheckAndSend(topicParts, message));
+        }
+
+        private void CompleteCheckAndSend(string[] topicParts, byte[] message)
+        {
             if (CheckDeny(topicParts, topicRulesDenyIn))
             {
-                //Topic Denyed by DenyIn-Rule
+                //Topic Denied by DenyIn-Rule
                 return;
             }
 
@@ -65,7 +71,7 @@ namespace TopicTrennerAPI.Service
             
             //if there is no topic to match... do nothing
         }
-
+        
         private void TreeWalk(byte[] message, string[] topicPartsMessageIn, int topicPartIndex, TopicVertex topicVertxRule)
         {
             if (topicVertxRule.AlgoRule.Count > 0)
@@ -82,7 +88,9 @@ namespace TopicTrennerAPI.Service
                 {
                     foreach (TopicVertex tv in tvList)
                     {
-                        if(tv.TopicPart.Equals(topicPartsMessageIn[topicPartIndex], StringComparison.InvariantCultureIgnoreCase) || tv.TopicPart.Equals("#", StringComparison.InvariantCultureIgnoreCase) || tv.TopicPart.Equals("+", StringComparison.InvariantCultureIgnoreCase))
+                        if(tv.TopicPart.Equals(topicPartsMessageIn[topicPartIndex], StringComparison.InvariantCultureIgnoreCase) 
+                                || tv.TopicPart.Equals("#", StringComparison.InvariantCultureIgnoreCase) 
+                                || tv.TopicPart.Equals("+", StringComparison.InvariantCultureIgnoreCase))
                         {
                             TreeWalk(message, topicPartsMessageIn, topicPartIndex, tv);
                         }
@@ -107,7 +115,9 @@ namespace TopicTrennerAPI.Service
                 topicPartIndex++;
                 foreach (TopicVertex tv in tvList)
                 {
-                    if (tv.TopicPart.Equals(topicPartsMessageIn[topicPartIndex], StringComparison.InvariantCultureIgnoreCase) || tv.TopicPart.Equals("#", StringComparison.InvariantCultureIgnoreCase) || tv.TopicPart.Equals("+", StringComparison.InvariantCultureIgnoreCase))
+                    if (tv.TopicPart.Equals(topicPartsMessageIn[topicPartIndex], StringComparison.InvariantCultureIgnoreCase) 
+                        || tv.TopicPart.Equals("#", StringComparison.InvariantCultureIgnoreCase) 
+                        || tv.TopicPart.Equals("+", StringComparison.InvariantCultureIgnoreCase))
                     {
                         stopLoop = TreeWalkDeny(topicPartsMessageIn, topicPartIndex, tv);
                     }
@@ -162,7 +172,7 @@ namespace TopicTrennerAPI.Service
             // wenn # dann feuer
             if (topicVertxRule.TopicPart == "#")
             {
-                SendTheMessagesByRules(message, topicPartsMessageIn, topicVertxRule.AlgoRule);
+                SendTheMessagesIfNotDenyOut(message, topicPartsMessageIn, topicVertxRule.AlgoRule);
             }
 
             // wenn der topicPart übereinstimmt und das der letzt Part ist dann feuer
@@ -170,11 +180,11 @@ namespace TopicTrennerAPI.Service
                 && (topicPartsMessageIn[topicPartIndex] == topicVertxRule.TopicPart
                     || topicPartsMessageIn[topicPartIndex] == "+"))
             {
-                SendTheMessagesByRules(message, topicPartsMessageIn, topicVertxRule.AlgoRule);
+                SendTheMessagesIfNotDenyOut(message, topicPartsMessageIn, topicVertxRule.AlgoRule);
             }
         }
 
-        private void SendTheMessagesByRules(byte[] message, string[] topicPartsMessageIn, List<IAlgoRule> rules)
+        private void SendTheMessagesIfNotDenyOut(byte[] message, string[] topicPartsMessageIn, List<IAlgoRule> rules)
         {
             foreach(IAlgoRule ar in rules)
             {
