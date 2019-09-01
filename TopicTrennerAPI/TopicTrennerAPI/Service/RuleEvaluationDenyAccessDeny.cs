@@ -73,12 +73,15 @@ namespace TopicTrennerAPI.Service
             if(tvList.Count > 0)
             {
                 topicPartIndex++;
-                foreach (TopicVertex tv in tvList)
+                if (topicPartsMessageIn.Length > topicPartIndex)
                 {
-                    if(tv.TopicPart.Equals(topicPartsMessageIn[topicPartIndex], StringComparison.InvariantCultureIgnoreCase) || tv.TopicPart.Equals("#", StringComparison.InvariantCultureIgnoreCase) || tv.TopicPart.Equals("+", StringComparison.InvariantCultureIgnoreCase))
+                    foreach (TopicVertex tv in tvList)
                     {
-                        TreeWalk(message, topicPartsMessageIn, topicPartIndex, tv);
-                    }
+                        if(tv.TopicPart.Equals(topicPartsMessageIn[topicPartIndex], StringComparison.InvariantCultureIgnoreCase) || tv.TopicPart.Equals("#", StringComparison.InvariantCultureIgnoreCase) || tv.TopicPart.Equals("+", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            TreeWalk(message, topicPartsMessageIn, topicPartIndex, tv);
+                        }
+                    }    
                 }
             }
         }
