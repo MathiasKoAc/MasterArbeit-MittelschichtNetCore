@@ -13,13 +13,15 @@ indem Sie diese MSBuild-Datei bearbeiten. Weitere Informationen hierzu finden Si
       <Value>Server=192.168.0.148%3b Port=3306%3b Database=smile%3b user=smile%3b Pwd=as7da5sd75po57a5sd7ajnk75jsgjk7svnxsc5v7nkjs7n11kjn7ekjhfg%3b charset=utf8%3b</Value>
     </DestinationConnectionStrings>
     <DestinationConnectionStrings Include="MqttDefaulConnectionPasswort">
-      <Value>HomeSmart</Value>
+      <Value>
+      </Value>
     </DestinationConnectionStrings>
     <DestinationConnectionStrings Include="MqttDefaulConnectionServer">
-      <Value>192.168.0.2</Value>
+      <Value>192.168.0.148</Value>
     </DestinationConnectionStrings>
     <DestinationConnectionStrings Include="MqttDefaulConnectionUser">
-      <Value>mqtt</Value>
+      <Value>
+      </Value>
     </DestinationConnectionStrings>
   </ItemGroup>
 </Project>
