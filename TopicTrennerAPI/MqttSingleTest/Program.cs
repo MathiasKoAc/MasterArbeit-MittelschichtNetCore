@@ -11,15 +11,15 @@ namespace MqttSingleTest
     class Program
     {
         private static MqttClient client;
-        //private static string brokerIp = "192.168.0.2";
-        private static string brokerIp = "192.168.0.148";
-        //private static string brokerUser = "mqtt";
-        private static string brokerUser = "";
-        //private static string brokerPwd = "HomeSmart";
-        private static string brokerPwd = "";
+        private static string brokerIp = "192.168.0.2";
+        //private static string brokerIp = "192.168.0.148";
+        private static string brokerUser = "mqtt";
+        //private static string brokerUser = "";
+        private static string brokerPwd = "HomeSmart";
+        //private static string brokerPwd = "";
 
         private static int anzMessages = 500;
-        private static int milliSecondsSleep = 5;
+        private static int milliSecondsSleep = 1;
         
         private static int counter = 0;
 

@@ -10,7 +10,7 @@
     <WebStackScaffolding_LayoutPageFile />
     <WebStackScaffolding_IsAsyncSelected>False</WebStackScaffolding_IsAsyncSelected>
     <WebStackScaffolding_DbContextTypeFullName>TopicTrennerAPI.Data.DbTopicTrennerContext</WebStackScaffolding_DbContextTypeFullName>
-    <NameOfLastUsedPublishProfile>publish-win</NameOfLastUsedPublishProfile>
+    <NameOfLastUsedPublishProfile>pulish-lin</NameOfLastUsedPublishProfile>
     <ActiveDebugProfile>TopicTrennerAPI</ActiveDebugProfile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

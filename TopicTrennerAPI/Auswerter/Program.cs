@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace Auswerter
 {
@@ -6,29 +7,43 @@ namespace Auswerter
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("File converter");
+            string[] files = System.IO.Directory.GetFiles(@"D:\workspace\Master-Arbeit\Benchmark\Raspberry", "*.txt");
 
-            int counter = 0;
+            foreach (string s in files)
+            {
+                readAndConvertFile(s);
+                System.Console.WriteLine(s+" convertet");
+            }
+            System.Console.WriteLine("--Finished--");
+            System.Console.ReadLine();
+        }
+
+        static void readAndConvertFile(string fileName)
+        {
             string line;
 
             // Read the file and display it line by line.  
-            System.IO.StreamReader file =
-                new System.IO.StreamReader(@"c:\run\test.txt");
+            StreamReader file =
+                new StreamReader(fileName);
+
+            var fileNameSplit = fileName.Split(".");
+
+            StreamWriter fileOutput = new StreamWriter(fileNameSplit[0]+".csv");
+
+            fileOutput.WriteLine("id;ticks;received;diffTicks;diffMilSec");
             while ((line = file.ReadLine()) != null)
             {
-                if(line.Length > 26 && line[0] == 'I' && line[1] == 'd' && line[2] == ':')
+                if (line.Length > 26 && line[0] == 'I' && line[1] == 'd' && line[2] == ':')
                 {
                     // System.Console.WriteLine(line);
-                    System.Console.WriteLine(toCsv(line));
-                    counter++;
+                    fileOutput.WriteLine(toCsv(line));
                 }
             }
-
             file.Close();
-            System.Console.WriteLine("There were {0} lines.", counter);
-            // Suspend the screen.  
-            System.Console.ReadLine();
+            fileOutput.Flush();
+            fileOutput.Close();
         }
+
         static string toCsv(string line)
         {
             string[] spilt = line.Split(" ");
